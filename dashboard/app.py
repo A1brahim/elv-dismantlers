@@ -9,8 +9,8 @@ import plotly.graph_objects as go
 
 st.set_page_config(layout="wide")
 
-st.title("ELV Financial Structure (2021–2024)")
-st.caption("Structural financial comparison of selected ELV dismantlers based on publicly aviailable financial statements.")
+st.title("Structural Benchmarking of Swedish ELV Dismantlers within 100Km Radius (Years 2021–2024)")
+st.caption("Comparative structural financial analysis of selected ELV dismantlers, focusing on growth durability, profitability quality, capital structure discipline, and competitive positioning based on publicly aviailable financial statements.")
 
 # --------------------------------------------------
 # LOAD PROCESSED DATA
@@ -70,7 +70,7 @@ if not df_filtered.empty:
    # Top Growth Performer
     with col1:
         st.metric(
-            label="Top Growth Performer",
+            label="Highest Growth Compounder",
             value=top_growth["Company"],
             delta=f"CAGR: {top_growth['CAGR_21_24']:.1%} | Industry Avg: {industry_avg_cagr:.1%}"
         )
@@ -78,7 +78,7 @@ if not df_filtered.empty:
     # Most Operationally Stable
     with col2:
         st.metric(
-            label="Most Operationally Stable",
+            label="Lowest Earnings Volatility",
             value=most_stable["Company"],
              delta=f"Operating Margin Volatility: {most_stable['Operating Margin Vol']:.1%} | Industry Avg: {industry_avg_margin:.1%}"
         )
@@ -196,7 +196,7 @@ st.plotly_chart(fig_growth, width="stretch")
 # SCATTER: Size vs Profitability
 # --------------------------------------------------
 
-st.subheader("Operating Margin vs Market Share")
+st.subheader("Scale vs Market Share")
 
 fig = px.scatter(
     df_filtered,
@@ -286,7 +286,7 @@ st.plotly_chart(fig2, use_container_width=True)
 # SCATTER: Capital Structure
 # --------------------------------------------------
 
-st.subheader("Capital Structure: Debt Ratio vs Equity Ratio")
+st.subheader("Capital Discipline: Leverage vs Equity Base")
 
 fig3 = px.scatter(
     df_filtered,
@@ -311,7 +311,7 @@ st.plotly_chart(fig3, use_container_width=True)
 # SCATTER: Liquidity vs Growth
 # --------------------------------------------------
 
-st.subheader("Liquidity vs Revenue Growth")
+st.subheader("Liquidity Buffer vs Revenue Growth")
 
 fig4 = px.scatter(
     df_filtered,
