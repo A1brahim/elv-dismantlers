@@ -192,6 +192,12 @@ fig_growth.update_yaxes(tickformat=".1%")
 
 st.plotly_chart(fig_growth, width="stretch")
 
+st.markdown(f"""
+**Growth Dispersion Insight:**  
+Sector average YoY growth volatility is {growth_df['std'].mean():.1%}, 
+indicating cyclical sensitivity and heterogeneous operational leverage across dismantlers.
+""")
+
 # --------------------------------------------------
 # SCATTER: Size vs Profitability
 # --------------------------------------------------
