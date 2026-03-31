@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 st.set_page_config(layout="wide")
 
 st.title("Structural Benchmarking of Swedish ELV Dismantlers within 100Km Radius (Years 2021–2024)")
-st.caption("Comparative structural financial analysis of selected ELV dismantlers, focusing on growth durability, profitability quality, capital structure discipline, and competitive positioning based on publicly aviailable financial statements.")
+st.caption("Comparative structural financial analysis of selected ELV dismantlers, focusing on growth durability, profitability quality, capital structure discipline, and competitive positioning. Analysis is based on publicly aviailable financial statements.")
 
 # --------------------------------------------------
 # LOAD PROCESSED DATA
