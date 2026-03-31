@@ -1,0 +1,22 @@
+county,company,city,address,postcode,phone,email,website,source,lat,lon,distance_km
+Orebro Lan,Ekholms Bildemontering AB,Kumla,Ljungströmsvägen 11,692 75,019-57 70 88,info@ekholmsbildemo.se,https://ekholmsbildemo.se/,SBR,59.1179551,15.1206208,15.127727052378265
+Orebro Lan,Örebro Bildemontering AB,Örebro,Maskingatan 1,702 86,019-670 12 00,info@mdorebro.se,https://www.orebrobildemo.se/,SBR,59.2747287,15.2151181,23.386224051655493
+Orebro Lan,Bjuhrs Bil AB,Karlskoga,Silovägen 3,691 42,0586-310 31,info@bjuhrsbilab.se,https://www.bjuhrsbilab.se/,SBR,59.3291667,14.5176911,27.454608322220743
+Orebro Lan,Nya Högåsens Bildemontering AB,Karlskoga,Högåsen 275,691 93,0586-72 72 55,nyahogasen@live.com,,SBR,59.3291667,14.5176911,27.454608322220743
+Orebro Lan,Svensk Bilåtervinning AB,Odensbacken,Industrivägen 8,715 31,019-450 690,info@svenskbilatervinning.se,http://www.svenskbilatervinning.se/,SBR,59.1625391,15.5255268,37.48231597583529
+Varmlands Lan,Kristinehamns Bildemontering & Bilservice AB,Kristinehamn,Vegagatan 3,681 42,0550-411 138,jasmin.kamber@gmail.com,http://www.kbbab.se/,SBR,59.3113619,14.11176,46.404720299374155
+Sodermanlands Lan,Vingåkers Bilskrot AB,Vingåker,Trollåsens Motorbana,64395,073-6755516,vingakersbilskrot@gmail.com,,SBR,59.066667,15.883333,58.984762595222925
+Orebro Lan,Arboga Bilskrot AB,Arboga,Kallstensgården 416,732 49,0589-124 40,info@arbogabilskrot.se,,SBR,59.394187,15.8396643,61.04130286570963
+Vastmanlands Lan,Köpings Bildemontering AB,Köping,Industrivägen 1,731 36,0221-17933,info@kopingsbildemontering.se,http://www.http://www.kopingsbildemontering.se/,SBR,59.5137434,15.9970475,75.1771072282216
+Vastra Gotalands Lan,Mariestads Bildemontering och Återvinningsteknik AB,Mariestad,Förrådsgatan 29,542 35,0501-19250,info@mariestadsbildemo.se,http://bildemonteringenimariestad.fbt.se/,SBR,58.7093225,13.8228754,78.57875996323294
+Varmlands Lan,Frykmalm i Karlstad AB,Karlstad,Hedjämnan 3,654 60,054-856 420,info@frykmalm.se,http://www.frykmalm.se/,SBR,59.3809146,13.5027631,81.71988970169296
+Vastmanlands Lan,Begagnade bildelar i Kolbäck AB,Kolbäck,Industrivägen 7,734 51,0220-417 14,info@begbildelarikolback.se,http://www.begbildelarikolback.se/,SBR,59.5624814,16.235983,89.5946764559685
+Vastra Gotalands Lan,Bilåtervinning i Tibro AB,Tibro,Värsåsvägen 42,543 35,050-461 350,info@bilatibro.se,https://www.bilatibro.se/,SBR,58.416667,14.2,91.57459105032446
+Ostergotlands Lan,Atracco Valla,Valla,Åsen,641 62,0150-660 160,info@vallabildemontering.se,https://lkqatracco.com/se/anlaggningar/lkq-atracco-valla/,SBR,58.4037494,15.5964361,94.27653946520212
+Ostergotlands Lan,Märkesdemo Linköping / Atracco AB Linköping,Linköping,Hägerhällsvägen 61,582 72,013-397 024,info@hards.se,https://www.mdlinkoping.se/,SBR,58.4098135,15.6245252,94.4099861340631
+Ostergotlands Lan,Östgöta Bildemontering AB,Linköping,Rönögatan 14,582 78,013-13 60 88,info@ostgotabildemontering.se,https://www.ostgotabildemontering.se/,SBR,58.4098135,15.6245252,94.4099861340631
+Ostergotlands Lan,Begagnade Bildelar i Linköping AB,Linköping,Ensbovägen 5,582 54,013-100 110,linkoping@begbildelar.com,https://www.begbildelar.com/,SBR,58.4098135,15.6245252,94.4099861340631
+Sodermanlands Lan,Eskilstuna Bildemontering AB,Eskilstuna,Kungsgatan 100,632 21,016-139 906,info@eskilstunabildemontering.nu,https://www.eskilstunabildemontering.nu/,SBR,59.3717379,16.5051474,96.12972705762579
+Ostergotlands Lan,James Bildemontering AB,Norrköping,Alholmsgatan 3,602 38,011-166058,info@sbilskrot.se,http://www.sbilskrot.se/,SBR,58.5909124,16.1903511,99.1809003644585
+Ostergotlands Lan,Norrköpings Bilskrot AB,Norrköping,Fjärilsgatan 17,603 61,076-184 03 30,info@norrkopingsbilskrot.se,http://info@norrkopingsbilskrot.se,SBR,58.5909124,16.1903511,99.1809003644585
+Ostergotlands Lan,Karstorps Bildemontering AB,Norrköping,Björkebergavägen,605 95,011-495 40 00,info@karstorpsbildemontering.se,http://www.karstorpsbildemontering.se/,SBR,58.5909124,16.1903511,99.1809003644585

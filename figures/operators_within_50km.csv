@@ -1,0 +1,7 @@
+county,company,city,address,postcode,phone,email,website,source,lat,lon,distance_km
+Orebro Lan,Ekholms Bildemontering AB,Kumla,Ljungströmsvägen 11,692 75,019-57 70 88,info@ekholmsbildemo.se,https://ekholmsbildemo.se/,SBR,59.1179551,15.1206208,15.127727052378265
+Orebro Lan,Örebro Bildemontering AB,Örebro,Maskingatan 1,702 86,019-670 12 00,info@mdorebro.se,https://www.orebrobildemo.se/,SBR,59.2747287,15.2151181,23.386224051655493
+Orebro Lan,Nya Högåsens Bildemontering AB,Karlskoga,Högåsen 275,691 93,0586-72 72 55,nyahogasen@live.com,,SBR,59.3291667,14.5176911,27.454608322220743
+Orebro Lan,Bjuhrs Bil AB,Karlskoga,Silovägen 3,691 42,0586-310 31,info@bjuhrsbilab.se,https://www.bjuhrsbilab.se/,SBR,59.3291667,14.5176911,27.454608322220743
+Orebro Lan,Svensk Bilåtervinning AB,Odensbacken,Industrivägen 8,715 31,019-450 690,info@svenskbilatervinning.se,http://www.svenskbilatervinning.se/,SBR,59.1625391,15.5255268,37.48231597583529
+Varmlands Lan,Kristinehamns Bildemontering & Bilservice AB,Kristinehamn,Vegagatan 3,681 42,0550-411 138,jasmin.kamber@gmail.com,http://www.kbbab.se/,SBR,59.3113619,14.11176,46.404720299374155
