@@ -25,7 +25,7 @@ def get_overlapping_years(df: pd.DataFrame) -> list:
             "Insufficient overlapping years across companies."
         )
 
-    return overlapping_years
+    return [int(y) for y in overlapping_years]
 
 
 # --------------------------------------------------
