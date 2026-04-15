@@ -615,7 +615,7 @@ else:
 # CAPITAL STRUCTURE SNAPSHOT (Latest Year)
 # ==================================================
 
-from metrics.balance_sheet import compute_latest_capital_structure
+from src.metrics.balance_sheet import compute_latest_capital_structure
 
 st.markdown(
     f"""
