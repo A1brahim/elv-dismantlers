@@ -98,7 +98,33 @@ sales_pivot["CAGR_21_24"] = np.where(
     np.nan
 )
 
+
 cagr = sales_pivot["CAGR_21_24"].reset_index()
+
+# --------------------------------------------------
+# 6️⃣ INDUSTRY STRUCTURE METRICS (YEARLY)
+# --------------------------------------------------
+
+# HHI contribution per company-year
+df["HHI Contribution"] = df["Market Share"] ** 2
+
+industry_structure = (
+    df.groupby("Year")
+    .agg({
+        "HHI Contribution": "sum"
+    })
+    .reset_index()
+)
+
+industry_structure = industry_structure.rename(
+    columns={"HHI Contribution": "HHI"}
+)
+
+# Effective number of firms
+industry_structure["Effective Firms"] = 1 / industry_structure["HHI"]
+
+# Merge industry structure back to main dataframe
+df = df.merge(industry_structure, on="Year", how="left")
 
 # --------------------------------------------------
 # 7️⃣ STRUCTURAL METRICS (AVG + VOLATILITY)
@@ -138,10 +164,26 @@ structural = structural.reset_index()
 final = structural.merge(cagr, on="Company", how="left")
 
 # --------------------------------------------------
+# 🔟 BUILD FULL METRICS DATASET (EXTENDED LAYER)
+# --------------------------------------------------
+
+# Merge CAGR into time-series layer
+df_full = df.merge(cagr, on="Company", how="left")
+
+# Add profit share per year (based on EBITDA)
+industry_ebitda = df.groupby("Year")["EBITDA"].transform("sum")
+df_full["Profit Share"] = safe_div(df_full["EBITDA"], industry_ebitda)
+
+# --------------------------------------------------
 # 9️⃣ SAVE OUTPUT
 # --------------------------------------------------
 
 df.to_csv("data/processed/elv_time_series.csv", index=False)
 final.to_csv("data/processed/elv_metrics.csv", index=False)
+df_full.to_csv("data/processed/elv_full_metrics.csv", index=False)
 
-print("Processing complete. Files saved to data/processed/elv_metrics.csv")
+print("Processing complete.")
+print("Saved:")
+print(" - data/processed/elv_time_series.csv")
+print(" - data/processed/elv_metrics.csv")
+print(" - data/processed/elv_full_metrics.csv")

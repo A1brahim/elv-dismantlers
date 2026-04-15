@@ -143,3 +143,43 @@ def build_balance_sheet_metrics(df: pd.DataFrame):
     summary_metrics = aggregate_balance_metrics(yearly_metrics)
 
     return overlap_years, yearly_metrics, summary_metrics
+
+# --------------------------------------------------
+# EXECUTIVE SUMMARY HELPER
+# --------------------------------------------------
+
+def compute_latest_capital_structure():
+    """
+    Returns:
+        capital_df (DataFrame): Latest year capital structure metrics per company
+        latest_year (int): Latest available reporting year
+    """
+
+    import pandas as pd
+    from pathlib import Path
+
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    DASHBOARD_PATH = PROJECT_ROOT / "dashboard"
+    YEARLY_PATH = DASHBOARD_PATH / "balance_sheet_yearly.csv"
+
+    yearly_df = pd.read_csv(YEARLY_PATH)
+
+    # Identify latest reporting year
+    latest_year = yearly_df["year"].max()
+
+    latest_df = yearly_df[yearly_df["year"] == latest_year].copy()
+
+    # Compute debt-to-equity ratio
+    latest_df["debt_to_equity"] = (
+        (latest_df["debt_ratio"] / 100) /
+        (latest_df["equity_ratio"] / 100)
+    )
+
+    capital_df = latest_df[[
+        "company",
+        "debt_ratio",
+        "equity_ratio",
+        "debt_to_equity"
+    ]].copy()
+
+    return capital_df, latest_year

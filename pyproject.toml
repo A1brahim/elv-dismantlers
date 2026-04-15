@@ -1,0 +1,11 @@
+[project]
+name = "elv_dismantlers"
+version = "0.1.0"
+description = "ELV dismantlers financial analytics engine"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
