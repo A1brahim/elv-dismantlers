@@ -7,7 +7,8 @@ import sys
 from pathlib import Path
 
 # Add project root to Python path
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+ROOT_DIR = Path(__file__).resolve().parents[2]
+sys.path.append(str(ROOT_DIR))
 
 import numpy as np
 from scipy.stats import pearsonr
