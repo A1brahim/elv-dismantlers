@@ -4,6 +4,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
+import sys
+from pathlib import Path
+
+# Add project root to Python path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 from src.metrics.operating_efficiency import (
     compute_operating_margin,
     compute_industry_operating_structure,
