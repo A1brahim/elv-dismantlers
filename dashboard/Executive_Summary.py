@@ -466,7 +466,7 @@ st.markdown(
 # OPERATING EFFICIENCY SNAPSHOT (2024)
 # ==================================================
 
-from metrics.operating_efficiency import (
+from src.metrics.operating_efficiency import (
     compute_operating_margin,
     compute_latest_operating_margin_ranking,
 )

@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import numpy as np
 from scipy.stats import pearsonr
 
-from metrics.capital_efficiency import (
+from src.metrics.capital_efficiency import (
     compute_asset_turnover,
     compute_industry_capital_structure,
     compute_latest_year_ranking,

@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-from metrics.operating_efficiency import (
+from src.metrics.operating_efficiency import (
     compute_operating_margin,
     compute_industry_operating_structure,
     compute_latest_operating_margin_ranking,

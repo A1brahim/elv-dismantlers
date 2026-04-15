@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 
-from metrics.market_structure import (
+from src.metrics.market_structure import (
     compute_average_market_share,
     compute_hhi,
     compute_market_share,
