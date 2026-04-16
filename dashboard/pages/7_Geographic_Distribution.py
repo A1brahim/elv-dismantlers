@@ -88,6 +88,7 @@ fig_map = px.scatter_geo(
     lon="lon",
     color="cluster_category",
     hover_name="company",
+    hover_data={"lat": False, "lon": False, "cluster_category": False},
     projection="mercator",
     color_discrete_map=cluster_colors,
     title="Geographic Distribution of SBR-Registered Operators"
@@ -108,6 +109,30 @@ fig_map.update_layout(
     margin=dict(l=0, r=0, t=40, b=0),
     legend_title_text="Operator Cluster"
 )
+
+# --------------------------------------------------
+# Major City Markers
+# --------------------------------------------------
+
+major_cities = pd.DataFrame({
+    "city": ["Stockholm", "Örebro", "Gothenburg", "Malmö"],
+    "lat": [59.3293, 59.2753, 57.7089, 55.6050],
+    "lon": [18.0686, 15.2134, 11.9746, 13.0038]
+})
+
+fig_map.add_trace(go.Scattergeo(
+    lat=major_cities["lat"],
+    lon=major_cities["lon"],
+    text=major_cities["city"],
+    mode="markers+text",
+    marker=dict(
+        size=6,
+        color="#5A6F89"
+    ),
+    textposition="top center",
+    name="Major Cities",
+    hovertemplate="<b>%{text}</b><extra></extra>"
+))
 
 st.plotly_chart(fig_map, use_container_width=True)
 
