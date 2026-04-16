@@ -1,8 +1,8 @@
 from pathlib import Path
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 import plotly.express as px
-import plotly.graph_objects as go
 
 # --------------------------------------------------
 # Page Setup
@@ -55,17 +55,16 @@ df["cluster_category"] = df["operator_count"].apply(classify_cluster)
 # --------------------------------------------------
 
 st.title("Geographic Structure of Swedish Bilåtervinning")
-st.caption(
-    "Spatial distribution of SBR (Sveriges Bilåtervinnares Riksförbund)-affiliated dismantling businesses."
-)
+st.caption("Spatial distribution of SBR (Sveriges Bilåtervinnares Riksförbund)-affiliated dismantling businesses.")
+
 
 st.markdown(
     "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 # --------------------------------------------------
-# National Operator Distribution (Plotly Map)
+# Sweden Map with Plotly (Cloud-Compatible)
 # --------------------------------------------------
 
 st.subheader("National Operator Distribution")
@@ -73,7 +72,7 @@ st.subheader("National Operator Distribution")
 cluster_colors = {
     "3+": "#741111",
     "2": "#CD5C5C",
-    "1": "#F1BBB6",
+    "1": "#F1BBB6"
 }
 
 fig_map = px.scatter_geo(
@@ -81,94 +80,100 @@ fig_map = px.scatter_geo(
     lat="lat",
     lon="lon",
     color="cluster_category",
-    color_discrete_map=cluster_colors,
     hover_name="company",
-    hover_data={
-        "city": True,
-        "operator_count": True,
-        "lat": False,
-        "lon": False,
-    },
+    projection="mercator",
+    color_discrete_map=cluster_colors,
+    title="Geographic Distribution of SBR-Registered Operators"
 )
 
 fig_map.update_geos(
     scope="europe",
-    showcountries=True,
-    countrycolor="#9CA3AF",
-    showcoastlines=True,
-    coastlinecolor="#6B7280",
-    showland=True,
-    landcolor="whitesmoke",
-    lataxis_range=[53, 72],
-    lonaxis_range=[5, 30],
+    fitbounds="locations",
+    visible=False
 )
 
 fig_map.update_layout(
-    height=700,
-    legend_title_text="Operator Cluster",
-    margin=dict(l=0, r=0, t=30, b=0),
+    margin=dict(l=0, r=0, t=40, b=0),
+    legend_title_text="Operator Cluster"
 )
 
 st.plotly_chart(fig_map, use_container_width=True)
 
 st.markdown(
     "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 # --------------------------------------------------
-# Cluster Distribution Bar Chart (Plotly)
+# Cluster Distribution Bar Chart
 # --------------------------------------------------
 
 st.subheader("City Operator Density Distribution")
 
 city_cluster_summary = (
     df.groupby(["city", "cluster_category"]).size()
-    .reset_index()
-    .groupby("cluster_category")["city"]
-    .nunique()
-    .reindex(["3+", "2", "1"])
+      .reset_index()
+      .groupby("cluster_category")["city"]
+      .nunique()
+      .reindex(["3+", "2", "1"])
 )
 
-label_map = {
-    "3+": "Three and More Operators",
-    "2": "Two Operators",
-    "1": "One Operator",
-}
+fig2, ax2 = plt.subplots(figsize=(4.8, 3))
 
-bar_df = pd.DataFrame(
-    {
-        "Category": [label_map[k] for k in ["3+", "2", "1"]],
-        "Cities": city_cluster_summary.values,
-        "Cluster": ["3+", "2", "1"],
-    }
+bars = ax2.bar(
+  ["Three\nand More\nOperators", "Two\nOperators", "One\nOperator"],
+    city_cluster_summary.values,
+    width=0.30,
+    color=[cluster_colors[k] for k in ["3+", "2", "1"]],
+    edgecolor="black",
+    linewidth=0.8
 )
 
-fig_bar = px.bar(
-    bar_df,
-    x="Category",
-    y="Cities",
-    color="Cluster",
-    color_discrete_map=cluster_colors,
-    text="Cities",
+# Title styling
+ax2.set_title(
+    "Cities by Operator Density",
+    fontsize=12,
+    fontweight="bold",
+    pad=15
 )
 
-fig_bar.update_layout(
-    plot_bgcolor="white",
-    showlegend=False,
-    height=400,
-    margin=dict(l=20, r=20, t=30, b=20),
-    xaxis_title="Operator Density",
-    yaxis_title="Number of Cities",
-)
+# Axis labels
+ax2.set_xlabel("Operator Density", fontsize=10, labelpad=12)
+ax2.set_ylabel("Number of Cities", fontsize=10, labelpad=12)
 
-fig_bar.update_traces(textposition="outside")
+# Subtle horizontal grid
+ax2.grid(axis="y", linestyle="--", linewidth=0.6, alpha=0.4)
+ax2.set_axisbelow(True)
 
-st.plotly_chart(fig_bar, use_container_width=True)
+# Remove top/right spines
+ax2.spines["top"].set_visible(False)
+ax2.spines["right"].set_visible(False)
+
+# Tick styling
+ax2.tick_params(axis="both", labelsize=8)
+
+# Value labels
+for bar in bars:
+    height = bar.get_height()
+    ax2.text(
+        bar.get_x() + bar.get_width() / 2,
+        height + 0.5,
+        f"{int(height)}",
+        ha="center",
+        va="bottom",
+        fontsize=10
+    )
+
+plt.tight_layout()
+
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.pyplot(fig2)
+
 
 st.markdown(
     "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 # --------------------------------------------------
@@ -179,22 +184,20 @@ st.markdown("### Structural Overview")
 
 summary_total_cities = df["city"].nunique()
 summary_total_firms = df["company"].nunique()
-summary_multi_operator = city_counts[
-    city_counts["operator_count"] >= 2
-]["city"].nunique()
+summary_multi_operator = city_counts[city_counts["operator_count"] >= 2]["city"].nunique()
 
-st.markdown(
-    f"""
+st.markdown(f"""
 - **Total operators:** {summary_total_firms}
 - **Total cities represented:** {summary_total_cities}
 - **Cities with two or more operators:** {summary_multi_operator}
-"""
-)
+""")
+
 
 st.markdown(
     "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
+
 
 # -------------------------------------------------
 # Public Dashboard Disclaimer
@@ -204,5 +207,5 @@ st.markdown(
     "**This dashboard presents analytical insights derived from publicly available financial data. "
     "It is intended for informational and exploratory purposes only and does not constitute financial advice.**<br>"
     "**Comprehensive firm-level analytical reports are available upon request.**",
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
