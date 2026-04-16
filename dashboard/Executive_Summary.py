@@ -17,14 +17,25 @@ sys.path.append(str(ROOT_DIR))
 st.set_page_config(layout="wide")
 
 # --------------------------------------------------
-# LANGUAGE TOGGLE
+# LANGUAGE SELECTOR (WITH FLAGS)
 # --------------------------------------------------
 
-LANG = st.sidebar.selectbox(
-    "Language / Språk",
-    options=["English", "Svenska"],
-    index=0
+st.sidebar.markdown("## 🌍 Language / Språk")
+
+lang_display = st.sidebar.selectbox(
+    "",
+    options=["English 🇬🇧", "Svenska 🇸🇪"],
+    index=0,
+    key="language_selector"
 )
+
+# Map display label to internal language key
+if lang_display.startswith("English"):
+    LANG = "English"
+else:
+    LANG = "Svenska"
+
+st.sidebar.markdown("---")
 
 # --------------------------------------------------
 # TRANSLATION DICTIONARY
@@ -58,6 +69,7 @@ TEXT = {
     }
 }
 
+# Set translation dictionary after language selection
 T = TEXT[LANG]
 
 
