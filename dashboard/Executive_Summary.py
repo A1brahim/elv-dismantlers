@@ -73,7 +73,15 @@ TEXT = {
         "insufficient_data": "Insufficient data available.",
         "no_operating_data": "No operating margin data available.",
         "insufficient_growth": "Insufficient firm-level growth data for latest year.",
-        "insufficient_momentum": "Insufficient data to compute market share momentum for the latest year."
+        "insufficient_momentum": "Insufficient data to compute market share momentum for the latest year.",
+        "yoy_summary": "Average YoY growth was **{avg}**, with typical dispersion of approximately **±{vol}** across firms. Industry growth moderated in 2023 before rebounding in 2024.",
+        "cagr_summary": "**Industry CAGR (2021–2024):** {mean} | Dispersion (±1σ): {std}, suggesting indicative variation in firm-level expansion trajectories.",
+        "operating_summary": "**Industry Operating Margin ({year}):** {mean} | Dispersion (±1σ): {std}, suggesting indicative differences in firm-level operating discipline.",
+        "leverage_summary": "**Industry Leverage ({year}):** Debt Ratio averaged {debt}, while Debt-to-Equity averaged {dte}. Extremes indicate meaningful divergence in capital structure positioning.",
+        "liquidity_summary": "**Industry Liquidity (2021–2024 Avg):** {mean} | Dispersion (±1σ): {std}. Higher liquidity suggests stronger short-term financial resilience and operational buffer capacity.",
+        "market_structure_summary": "**Market Structure Interpretation ({year}):** Top 3 firms control {cr3} of total market share. An HHI of {hhi} implies effective competition equivalent to ~{eff} equally sized firms, indicating a structurally concentrated market.",
+        "revenue_context_summary": "**Industry Revenue Context (2021–2024):** Total market size contracted in 2022 before rebounding in 2023 and 2024, indicating a temporal dip rather than persistent structural decline. Changes in revenue growth should therefore be interpreted against both increase in demand and firm-level execution.",
+        "momentum_summary": "**Structural Momentum ({year}):** Market share redistribution totaled approximately **{redistribution}** of the industry, indicating active competitive realignment. Firms gaining share are structurally positioned to capture disproportionate future profit pools within a concentrated market.",
     },
     "Svenska": {
         "page_title": "ELV – Finansiell Struktur (2021–2024)",
@@ -106,7 +114,15 @@ TEXT = {
         "insufficient_data": "Otillräcklig data tillgänglig.",
         "no_operating_data": "Ingen data för rörelsemarginal tillgänglig.",
         "insufficient_growth": "Otillräcklig företagsdata för senaste året.",
-        "insufficient_momentum": "Otillräcklig data för att beräkna marknadsandelsförändring."
+        "insufficient_momentum": "Otillräcklig data för att beräkna marknadsandelsförändring.",
+        "yoy_summary": "Genomsnittlig årlig tillväxt (YoY) uppgick till **{avg}**, med en typisk spridning på cirka **±{vol}** mellan företagen. Tillväxten dämpades 2023 innan den återhämtade sig 2024.",
+        "cagr_summary": "**Branschens CAGR (2021–2024):** {mean} | Spridning (±1σ): {std}, vilket indikerar variation i företagens expansion.",
+        "operating_summary": "**Branschens Rörelsemarginal ({year}):** {mean} | Spridning (±1σ): {std}, vilket indikerar skillnader i operativ effektivitet mellan företag.",
+        "leverage_summary": "**Branschens Skuldsättning ({year}):** Skuldkvoten uppgick i genomsnitt till {debt}, medan skuldsättningsgrad (Debt-to-Equity) uppgick till {dte}. Extremvärden indikerar tydliga skillnader i kapitalstruktur.",
+        "liquidity_summary": "**Branschens Likviditet (Genomsnitt 2021–2024):** {mean} | Spridning (±1σ): {std}. Högre likviditet indikerar starkare kortsiktig finansiell motståndskraft och operativ buffertkapacitet.",
+        "market_structure_summary": "**Marknadsstruktur ({year}):** De tre största företagen kontrollerar **{cr3}** av marknaden. Ett HHI på **{hhi}** motsvarar cirka {eff} lika stora aktörer, vilket indikerar en strukturellt koncentrerad marknad.",
+        "revenue_context_summary": "**Intäktskontext (2021–2024):** Den totala marknadsvolymen minskade 2022 innan den återhämtade sig 2023 och 2024, vilket tyder på en temporär nedgång snarare än en strukturell försämring. Förändringar i tillväxt bör därför tolkas mot bakgrund av både efterfrågan och företagens genomförandeförmåga.",
+        "momentum_summary": "**Strukturellt Momentum ({year}):** Marknadsandelsförändringar uppgick till cirka **{redistribution}** av branschen, vilket indikerar aktiv konkurrensmässig ompositionering. Företag som ökar sin andel är strukturellt positionerade för att fånga en oproportionerlig del av framtida vinstpooler."
     }
 }
 
@@ -433,8 +449,10 @@ industry_vol = growth_df["std"].mean()
 st.markdown(
     f"""
     **{T['industry_growth_block']}**  
-    Average YoY growth was **{industry_avg:.1%}**, with typical dispersion of approximately **±{industry_vol:.1%}** across firms.
-    Industry growth moderated in 2023 before rebounding in 2024.
+    {T['yoy_summary'].format(
+        avg=f"{industry_avg:.1%}",
+        vol=f"{industry_vol:.1%}"
+    )}
     """
 )
 
@@ -569,9 +587,10 @@ st.markdown("<br>", unsafe_allow_html=True)
 # --------------------------------------------------
 
 st.markdown(
-    f"""
-    **Industry CAGR (2021–2024):** {industry_mean:.1%}  | Dispersion (±1σ): {industry_std:.1%}, suggesting indicative variation in firm-level expansion trajectories.
-    """
+    T["cagr_summary"].format(
+        mean=f"{industry_mean:.1%}",
+        std=f"{industry_std:.1%}"
+    )
 )
 st.markdown(
     "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
@@ -712,9 +731,13 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    **Industry Operating Margin ({latest_year}):** {industry_mean_op:.1%} | Dispersion (±1σ): {industry_std_op:.1%}, suggesting indicative differences in firm-level operating discipline.
-    """)
+    st.markdown(
+        T["operating_summary"].format(
+            year=latest_year,
+            mean=f"{industry_mean_op:.1%}",
+            std=f"{industry_std_op:.1%}"
+        )
+    )
     st.markdown(
         "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
         unsafe_allow_html=True
@@ -875,11 +898,11 @@ with col_cards:
     """, unsafe_allow_html=True)
 
 st.markdown(
-    f"""
-    **Industry Leverage ({capital_year}):** Debt Ratio averaged {industry_mean_debt:.1%}, 
-    while Debt-to-Equity averaged {industry_mean_dte:.2f}. 
-    Extremes indicate meaningful divergence in capital structure positioning.
-    """
+    T["leverage_summary"].format(
+        year=capital_year,
+        debt=f"{industry_mean_debt:.1%}",
+        dte=f"{industry_mean_dte:.2f}"
+    )
 )
 st.markdown(
     "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
@@ -1230,10 +1253,10 @@ with col_liq_right:
         """, unsafe_allow_html=True)
 
 st.markdown(
-    f"""
-    **Industry Liquidity (2021–2024 Avg):** {industry_mean_liq:.2f}x | Dispersion (±1σ): {industry_std_liq:.2f}x.
-    Higher liquidity suggests stronger short-term financial resilience and operational buffer capacity.
-    """
+    T["liquidity_summary"].format(
+        mean=f"{industry_mean_liq:.2f}x",
+        std=f"{industry_std_liq:.2f}x"
+    )
 )
 
 st.markdown(
@@ -1385,11 +1408,12 @@ with col_ms_right:
     """, unsafe_allow_html=True)
 
 st.markdown(
-    f"""
-    **Market Structure Interpretation ({latest_year_ms}):**  
-    Top 3 firms control **{cr3:.1%}** of total market share.  
-    An HHI of **{hhi:.2f}** implies effective competition equivalent to ~{effective_firms:.1f} equally sized firms, indicating a structurally concentrated market.
-    """
+    T["market_structure_summary"].format(
+        year=latest_year_ms,
+        cr3=f"{cr3:.1%}",
+        hhi=f"{hhi:.2f}",
+        eff=f"{effective_firms:.1f}"
+    )
 )
 
 st.markdown(
@@ -1599,13 +1623,7 @@ with col_vol_right:
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown(
-    f"""
-    **Industry Revenue Context (2021–2024):**
-    Total market size contracted in 2022 before rebounding in 2023 and 2024, indicating a temporal dip
-    rather than persistent structural decline. Changes in revenue growth should therefore be interpreted against both increase in demand and firm-level execution.
-    """
-)
+st.markdown(T["revenue_context_summary"])
 
 
 
@@ -1777,12 +1795,10 @@ if not df_momentum_latest.empty:
     # Executive Interpretation
     # --------------------------------------------------
     st.markdown(
-        f"""
-        **Structural Momentum ({latest_year_momentum}):**  
-        Even within the dynamics of a rebounding industry, market share redistribution totaled approximately **{net_redistribution:.2%}** of the industry, 
-        indicating active competitive realignment. Firms gaining share are structurally positioned 
-        to capture a disproportionate portion of future profit pools due to the concentrated market environment.
-        """
+        T["momentum_summary"].format(
+            year=latest_year_momentum,
+            redistribution=f"{net_redistribution:.2%}"
+        )
     )
 else:
     st.info(T["insufficient_momentum"])
