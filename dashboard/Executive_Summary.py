@@ -44,7 +44,7 @@ st.sidebar.markdown("---")
 TEXT = {
     "English": {
         "page_title": "ELV Financial Structure (2021–2024)",
-        "page_subtitle": "Structural financial comparison of selected Swedish End-of-Life Vehicle Dismantlers based on publicly available financial statements. Only <a href='https://www.skrotfrag.se/' target='_blank'>Skrotfrag-registered dismantling businesses</a> have been included in the analysis.",
+        "page_subtitle": "Structural financial comparison of selected Swedish End-of-Life Vehicle Dismantlers based on publicly available financial statements. Only <a href='https://sbrservice.se/skrota-din-bil-bilskrot/bildemonterare' target='_blank'>SBR-affiliated dismantling businesses</a> have been included in the analysis.",
         "filters": "Filters",
         "select_companies": "Select Companies",
         "executive_section": "Executive Summary & Key Insights (Yrs 2021–2024)",
@@ -85,7 +85,7 @@ TEXT = {
     },
     "Svenska": {
         "page_title": "ELV Finansiell Struktur (2021–2024)",
-        "page_subtitle": "Strukturell finansiell jämförelse av utvalda svenska bilåtervinnare baserad på offentligt tillgängliga årsredovisningar. Endast <a href='https://www.skrotfrag.se/' target='_blank'>Skrotfrag-registrerade demonteringsverksamheter</a> har inkluderats i analysen.",
+        "page_subtitle": "Strukturell finansiell jämförelse av utvalda svenska bilåtervinnare baserad på offentligt tillgängliga årsredovisningar. Endast <a href='https://sbrservice.se/skrota-din-bil-bilskrot/bildemonterare' target='_blank'>SBR-anslutna demonteringsverksamheter</a> har inkluderats i analysen.",
         "filters": "Filter",
         "select_companies": "Välj företag",
         "executive_section": "Sammanfattning & Nyckelinsikter (2021–2024)",
