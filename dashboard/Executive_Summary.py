@@ -84,7 +84,7 @@ TEXT = {
         "momentum_summary": "**Structural Momentum ({year}):** Market share redistribution totaled approximately **{redistribution}** of the industry, indicating active competitive realignment. Firms gaining share are structurally positioned to capture disproportionate future profit pools within a concentrated market.",
     },
     "Svenska": {
-        "page_title": "ELV Finansiell Struktur (2021–2024)",
+        "page_title": "Finansiell struktur inom svensk bilåtervinning (2021–2024)",
         "page_subtitle": "Strukturell finansiell jämförelse av utvalda svenska bilåtervinnare baserad på offentligt tillgängliga årsredovisningar. Endast <a href='https://sbrservice.se/skrota-din-bil-bilskrot/bildemonterare' target='_blank'>SBR (Sveriges Bilåtervinnares Riksförbund)-anslutna demonteringsverksamheter</a> har inkluderats i analysen.",
         "filters": "Filter",
         "select_companies": "Välj företag",
@@ -135,7 +135,7 @@ st.markdown(
     <h1 style="margin-bottom:0.3rem;">
         {T["page_title"]}
     </h1>
-    <div style="font-size:1.05rem; color:#374151; font-weight:500; margin-bottom:1.8rem; line-height:1.0;">
+    <div style="font-size:1.05rem; color:#374151; font-weight:500; margin-bottom:1.8rem; line-height:1.5;">
         {T["page_subtitle"]}
     </div>
     """,
