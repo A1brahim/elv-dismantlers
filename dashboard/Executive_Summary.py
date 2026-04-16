@@ -44,7 +44,7 @@ st.sidebar.markdown("---")
 TEXT = {
     "English": {
         "page_title": "ELV Financial Structure (2021–2024)",
-        "page_subtitle": "Structural financial comparison of selected End-of-Life Vehicle Dismantlers based on publicly available financial statements.",
+        "page_subtitle": "Structural financial comparison of selected Swedish End-of-Life Vehicle Dismantlers based on publicly available financial statements. Only skrotfrag-registered dismantling businesses have been included in the analysis.",
         "filters": "Filters",
         "select_companies": "Select Companies",
         "executive_section": "Executive Summary & Key Insights (Yrs 2021–2024)",
@@ -84,8 +84,8 @@ TEXT = {
         "momentum_summary": "**Structural Momentum ({year}):** Market share redistribution totaled approximately **{redistribution}** of the industry, indicating active competitive realignment. Firms gaining share are structurally positioned to capture disproportionate future profit pools within a concentrated market.",
     },
     "Svenska": {
-        "page_title": "ELV – Finansiell Struktur (2021–2024)",
-        "page_subtitle": "Strukturell finansiell jämförelse av utvalda svenska bilåtervinnare baserad på offentligt tillgängliga årsredovisningar.",
+        "page_title": "ELV Finansiell Struktur (2021–2024)",
+        "page_subtitle": "Strukturell finansiell jämförelse av utvalda svenska bilåtervinnare baserad på offentligt tillgängliga årsredovisningar. Endast skrotfrag-registrerade demonteringsverksamheter har inkluderats i analysen.",
         "filters": "Filter",
         "select_companies": "Välj företag",
         "executive_section": "Sammanfattning & Nyckelinsikter (2021–2024)",
