@@ -16,15 +16,58 @@ sys.path.append(str(ROOT_DIR))
 
 st.set_page_config(layout="wide")
 
+# --------------------------------------------------
+# LANGUAGE TOGGLE
+# --------------------------------------------------
+
+LANG = st.sidebar.selectbox(
+    "Language / Språk",
+    options=["English", "Svenska"],
+    index=0
+)
+
+# --------------------------------------------------
+# TRANSLATION DICTIONARY
+# --------------------------------------------------
+
+TEXT = {
+    "English": {
+        "page_title": "ELV Financial Structure (2021–2024)",
+        "page_subtitle": "Structural financial comparison of selected End-of-Life Vehicle Dismantlers based on publicly available financial statements.",
+        "filters": "Filters",
+        "select_companies": "Select Companies",
+        "executive_section": "Executive Summary & Key Insights (Yrs 2021–2024)",
+        "no_companies": "No companies selected. Please adjust the filters.",
+        "industry_growth_summary": "Industry Revenue Growth (2021–2024):",
+        "structural_scale": "Structural Scale Effect:",
+        "scale_profit": "Scale–Profitability Relationship:",
+        "disclaimer": "This dashboard presents analytical insights derived from publicly available financial data. It is intended for informational and exploratory purposes only and does not constitute financial advice. Comprehensive firm-level analytical reports are available upon request."
+    },
+
+    "Svenska": {
+        "page_title": "ELV – Finansiell Struktur (2021–2024)",
+        "page_subtitle": "Strukturell finansiell jämförelse av utvalda svenska bilåtervinnare baserad på offentligt tillgängliga årsredovisningar.",
+        "filters": "Filter",
+        "select_companies": "Välj företag",
+        "executive_section": "Sammanfattning & Nyckelinsikter (2021–2024)",
+        "no_companies": "Inga företag valda. Justera filtren.",
+        "industry_growth_summary": "Branschens Intäktstillväxt (2021–2024):",
+        "structural_scale": "Strukturell Skaleffekt:",
+        "scale_profit": "Samband mellan Storlek och Lönsamhet:",
+        "disclaimer": "Denna dashboard presenterar analytiska insikter baserade på offentligt tillgänglig finansiell data. Informationen är avsedd för analytiska och explorativa ändamål och utgör inte finansiell rådgivning. Fördjupade företagsrapporter kan tillhandahållas på begäran."
+    }
+}
+
+T = TEXT[LANG]
+
 
 st.markdown(
-    """
+    f"""
     <h1 style="margin-bottom:0.3rem;">
-        ELV Financial Structure (2021–2024)
+        {T["page_title"]}
     </h1>
     <div style="font-size:1.05rem; color:#374151; font-weight:500; margin-bottom:1.8rem; line-height:1.0;">
-        Structural financial comparison of selected End-of-Life Vehicle Dismantlers 
-        based on publicly available financial statements.
+        {T["page_subtitle"]}
     </div>
     """,
     unsafe_allow_html=True
@@ -51,10 +94,10 @@ df, df_ts = load_data()
 # SIDEBAR FILTER
 # --------------------------------------------------
 
-st.sidebar.header("Filters")
+st.sidebar.header(T["filters"])
 
 selected_companies = st.sidebar.multiselect(
-    "Select Companies",
+    T["select_companies"],
     options=df["Company"].unique(),
     default=df["Company"].unique()
 )
@@ -73,7 +116,7 @@ industry_avg_market_share = df_filtered["Avg Market Share"].mean()
 # EXECUTIVE SUMMARY & KEY INSIGHTS
 # --------------------------------------------------
 
-st.markdown("### Executive Summary & Key Insights (Yrs 2021–2024)")
+st.markdown(f"### {T['executive_section']}")
 
 if not df_filtered.empty:
     # Top Growth Performer
@@ -193,9 +236,12 @@ if not df_filtered.empty:
     cr3_exec = np.sort(shares_exec)[-3:].sum() if len(shares_exec) >= 3 else np.nan
     hhi_exec = np.sum(shares_exec ** 2) if len(shares_exec) > 0 else np.nan
 
-    st.markdown(
-        f"""
-        <div style="font-size: 13px; margin-top: 10px; margin-bottom: 2.5rem; line-height: 1.6;">
+    # --------------------------------------------------
+    # Executive Insight Text (Language Aware)
+    # --------------------------------------------------
+
+    if LANG == "English":
+        executive_text = f"""
         <strong>Industry Insight:</strong>  
         The correlation between <em>Average Market Share</em> and <em>Average Operating Margin</em> is 
         <strong>{corr:.2f}</strong>, suggesting that scale is associated with stronger profitability across the sector. 
@@ -203,18 +249,29 @@ if not df_filtered.empty:
         <strong>{market_cagr:.1%}</strong> CAGR, with total revenue increasing by 
         <strong>{revenue_increase_pct:.1%}</strong>, while competitive concentration remained elevated 
         (CR3 <strong>{cr3_exec:.1%}</strong>, HHI <strong>{hhi_exec:.2f}</strong>), reinforcing scale-driven profitability dynamics.
+        """
+    else:
+        executive_text = f"""
+        <strong>Branschinsikt:</strong>  
+        Korrelationskoefficienten mellan <em>Genomsnittlig Marknadsandel</em> och <em>Genomsnittlig Rörelsemarginal</em> är 
+        <strong>{corr:.2f}</strong>, vilket indikerar att större marknadsandelar är förknippade med högre lönsamhet i sektorn. 
+        Under perioden 2021–2024 växte den svenska ELV-demonteringssektorn med en CAGR på 
+        <strong>{market_cagr:.1%}</strong>, där den totala omsättningen ökade med 
+        <strong>{revenue_increase_pct:.1%}</strong>. Samtidigt förblev marknadskoncentrationen hög 
+        (CR3 <strong>{cr3_exec:.1%}</strong>, HHI <strong>{hhi_exec:.2f}</strong>), vilket förstärker dynamiken där skala driver lönsamhet.
+        """
+
+    st.markdown(
+        f"""
+        <div style="font-size: 13px; margin-top: 10px; margin-bottom: 2.5rem; line-height: 1.6;">
+            {executive_text}
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        "<hr style='border: none; border-top: 1.5px solid #9CA3AF; margin: 0 0 2.5rem 0;'>",
-        unsafe_allow_html=True
-    )
-
 else:
-    st.warning("No companies selected. Please adjust the filters.")
+    st.warning(T["no_companies"])
 
 
 # --------------------------------------------------
@@ -225,7 +282,7 @@ st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
        Revenue Growth Dynamics (Year-over-Year)
-    <<div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
+    <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Firm Dispersion and Industry Trend: 2021–2024
     </div>
     """,
@@ -1687,8 +1744,6 @@ st.markdown(
 # -------------------------------------------------
 st.markdown("---")
 st.markdown(
-    "**This dashboard presents analytical insights derived from publicly available financial data. "
-    "It is intended for informational and exploratory purposes only and does not constitute financial advice.**<br>"
-    "**Comprehensive firm-level analytical reports are available upon request.**",
+    f"**{T['disclaimer']}**",
     unsafe_allow_html=True
 )
