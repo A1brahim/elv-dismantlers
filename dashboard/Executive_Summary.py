@@ -101,7 +101,7 @@ TEXT = {
         "year": "År",
         "yoy_growth": "Årlig Intäktstillväxt",
         "industry_growth_block": "Branschens Intäktstillväxt (2021–2024):",
-        "cagr_snapshot_title": "Intäktstillväxt – CAGR Översikt",
+        "cagr_snapshot_title": "Intäktstillväxt – sammansatt årlig tillväxttakt (CAGR) Översikt",
         "cagr_snapshot_sub": "Branschens Baslinje och Extremer: 2021–2024",
         "operating_snapshot_title": "Operativ Effektivitet – Översikt",
         "capital_snapshot_title": "Kapitalstruktur – Översikt",
