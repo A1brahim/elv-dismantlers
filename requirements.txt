@@ -15,7 +15,6 @@ cryptography==46.0.5
 cycler==0.12.1
 debugpy==1.8.20
 decorator==5.2.1
--e git+https://github.com/A1brahim/elv-dismantlers.git@a54f734c5e0e46ce54a52778884dacd1021a9037#egg=elv_dismantlers
 executing==2.2.1
 fonttools==4.61.1
 geographiclib==2.1
