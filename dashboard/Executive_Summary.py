@@ -52,9 +52,29 @@ TEXT = {
         "industry_growth_summary": "Industry Revenue Growth (2021–2024):",
         "structural_scale": "Structural Scale Effect:",
         "scale_profit": "Scale–Profitability Relationship:",
-        "disclaimer": "This dashboard presents analytical insights derived from publicly available financial data. It is intended for informational and exploratory purposes only and does not constitute financial advice. Comprehensive firm-level analytical reports are available upon request."
+        "disclaimer": "This dashboard presents analytical insights derived from publicly available financial data. It is intended for informational and exploratory purposes only and does not constitute financial advice. Comprehensive firm-level analytical reports are available upon request.",
+        "yoy_section_title": "Revenue Growth Dynamics (Year-over-Year)",
+        "yoy_section_sub": "Firm Dispersion and Industry Trend: 2021–2024",
+        "industry_avg_yoy": "Industry Average YoY Growth",
+        "volatility_band": "Volatility Band",
+        "year": "Year",
+        "yoy_growth": "YoY Revenue Growth",
+        "industry_growth_block": "Industry Revenue Growth (2021–2024):",
+        "cagr_snapshot_title": "Revenue Growth Snapshot (Compound Annual Growth Rate)",
+        "cagr_snapshot_sub": "Industry Baseline and Extremes: 2021–2024",
+        "operating_snapshot_title": "Operating Efficiency Snapshot (Operating Margin)",
+        "capital_snapshot_title": "Capital Structure Snapshot",
+        "market_snapshot_title": "Market Structure Snapshot",
+        "liquidity_snapshot_title": "Liquidity Snapshot",
+        "momentum_snapshot_title": "Structural Momentum — Market Share Shift",
+        "industry_revenue_trend": "Industry Revenue Trend (Market Size)",
+        "structural_effect": "Structural Scale Effect:",
+        "scale_relationship": "Scale–Profitability Relationship:",
+        "insufficient_data": "Insufficient data available.",
+        "no_operating_data": "No operating margin data available.",
+        "insufficient_growth": "Insufficient firm-level growth data for latest year.",
+        "insufficient_momentum": "Insufficient data to compute market share momentum for the latest year."
     },
-
     "Svenska": {
         "page_title": "ELV – Finansiell Struktur (2021–2024)",
         "page_subtitle": "Strukturell finansiell jämförelse av utvalda svenska bilåtervinnare baserad på offentligt tillgängliga årsredovisningar.",
@@ -65,7 +85,28 @@ TEXT = {
         "industry_growth_summary": "Branschens Intäktstillväxt (2021–2024):",
         "structural_scale": "Strukturell Skaleffekt:",
         "scale_profit": "Samband mellan Storlek och Lönsamhet:",
-        "disclaimer": "Denna dashboard presenterar analytiska insikter baserade på offentligt tillgänglig finansiell data. Informationen är avsedd för analytiska och explorativa ändamål och utgör inte finansiell rådgivning. Fördjupade företagsrapporter kan tillhandahållas på begäran."
+        "disclaimer": "Denna dashboard presenterar analytiska insikter baserade på offentligt tillgänglig finansiell data. Informationen är avsedd för analytiska och explorativa ändamål och utgör inte finansiell rådgivning. Fördjupade företagsrapporter kan tillhandahållas på begäran.",
+        "yoy_section_title": "Intäktstillväxt (År-för-År)",
+        "yoy_section_sub": "Företagsspridning och Branschtrend: 2021–2024",
+        "industry_avg_yoy": "Branschens Genomsnittliga Årstillväxt",
+        "volatility_band": "Volatilitetsintervall",
+        "year": "År",
+        "yoy_growth": "Årlig Intäktstillväxt",
+        "industry_growth_block": "Branschens Intäktstillväxt (2021–2024):",
+        "cagr_snapshot_title": "Intäktstillväxt – CAGR Översikt",
+        "cagr_snapshot_sub": "Branschens Baslinje och Extremer: 2021–2024",
+        "operating_snapshot_title": "Operativ Effektivitet – Översikt",
+        "capital_snapshot_title": "Kapitalstruktur – Översikt",
+        "market_snapshot_title": "Marknadsstruktur – Översikt",
+        "liquidity_snapshot_title": "Likviditet – Översikt",
+        "momentum_snapshot_title": "Strukturell Dynamik – Förändring i Marknadsandel",
+        "industry_revenue_trend": "Branschens Intäktstrend (Marknadsstorlek)",
+        "structural_effect": "Strukturell Skaleffekt:",
+        "scale_relationship": "Samband mellan Skala och Lönsamhet:",
+        "insufficient_data": "Otillräcklig data tillgänglig.",
+        "no_operating_data": "Ingen data för rörelsemarginal tillgänglig.",
+        "insufficient_growth": "Otillräcklig företagsdata för senaste året.",
+        "insufficient_momentum": "Otillräcklig data för att beräkna marknadsandelsförändring."
     }
 }
 
@@ -293,9 +334,9 @@ else:
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Revenue Growth Dynamics (Year-over-Year)
+       {T['yoy_section_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
-        Firm Dispersion and Industry Trend: 2021–2024
+        {T['yoy_section_sub']}
     </div>
     """,
     unsafe_allow_html=True
@@ -349,7 +390,7 @@ fig_growth.add_trace(go.Scatter(
     fill="tonexty",
     fillcolor="rgba(90,111,137,0.1)",
     line=dict(width=0),
-    name="Volatility Band",
+    name=T["volatility_band"],
     hoverinfo="skip"
 ))
 
@@ -359,14 +400,14 @@ fig_growth.add_trace(go.Scatter(
     y=growth_df["mean"],
     mode="lines",
     line=dict(color="#F28B82", width=2.5),
-    name="Industry Average YoY Growth",
+    name=T["industry_avg_yoy"],
     hovertemplate="%{y:.2%}<extra></extra>"
 ))
 
 fig_growth.update_layout(
     plot_bgcolor="white",
-    xaxis_title="Year",
-    yaxis_title="YoY Revenue Growth",
+    xaxis_title=T["year"],
+    yaxis_title=T["yoy_growth"],
     height=550,
     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
 )
@@ -391,7 +432,7 @@ industry_vol = growth_df["std"].mean()
 
 st.markdown(
     f"""
-    **Industry Revenue Growth (2021–2024):**  
+    **{T['industry_growth_block']}**  
     Average YoY growth was **{industry_avg:.1%}**, with typical dispersion of approximately **±{industry_vol:.1%}** across firms.
     Industry growth moderated in 2023 before rebounding in 2024.
     """
@@ -409,9 +450,9 @@ st.markdown(
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Revenue Growth Snapshot (Compound Annual Growth Rate)
+       {T['cagr_snapshot_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
-        Industry Baseline and Extremes: 2021–2024
+        {T['cagr_snapshot_sub']}
     </div>
     """,
     unsafe_allow_html=True
@@ -549,7 +590,7 @@ from src.metrics.operating_efficiency import (
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Operating Efficiency Snapshot (Operating Margin)
+       {T['operating_snapshot_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Industry Baseline and Extremes — Latest Year
     </div>
@@ -567,7 +608,7 @@ df_operating = compute_operating_margin(df_operating)
 latest_ranking, latest_year = compute_latest_operating_margin_ranking(df_operating)
 
 if latest_ranking.empty:
-    st.warning("No operating margin data available.")
+    st.warning(T["no_operating_data"])
 else:
 
     industry_mean_op = latest_ranking["operating_margin"].mean()
@@ -689,7 +730,7 @@ from src.metrics.balance_sheet import compute_latest_capital_structure
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Capital Structure Snapshot
+       {T['capital_snapshot_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Industry Baseline and Extremes — Latest Year
     </div>
@@ -852,7 +893,7 @@ st.markdown(
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Operating Margin vs Market Share
+       {T['operating_snapshot_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Industry Baseline and Extremes — Latest Year
     </div>
@@ -1032,9 +1073,9 @@ corr = df_filtered["Avg Market Share"].corr(
 
 st.markdown(
     f"""
-    **Structural Scale Effect:** Firms above the industry means in both market share ({share_mean:.1%}) 
+    **{T['structural_effect']}** Firms above the industry means in both market share ({share_mean:.1%}) 
     and operating margin ({margin_mean:.1%}) occupy the structural leadership quadrant.
-    **Scale–Profitability Relationship:** The correlation between scale and operating margin is 
+    **{T['scale_relationship']}** The correlation between scale and operating margin is 
     **{corr:.2f}**, indicating that larger firms tend to exhibit stronger operating efficiency.
     """
 )
@@ -1051,7 +1092,7 @@ st.markdown(
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Liquidity Snapshot
+       {T['liquidity_snapshot_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Industry Baseline and Extremes — 2021–2024 Average
     </div>
@@ -1207,7 +1248,7 @@ st.markdown(
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Market Structure Snapshot
+       {T['market_snapshot_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Industry Baseline and Concentration — Latest Year
     </div>
@@ -1364,7 +1405,7 @@ st.markdown(
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Industry Revenue Trend (Market Size)
+       {T['industry_revenue_trend']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Industry Revenue Expansion and Competitive Positioning (2021–2024)
     </div>
@@ -1505,7 +1546,7 @@ with col_vol_right:
         """, unsafe_allow_html=True)
 
     else:
-        st.info("Insufficient firm-level growth data for latest year.")
+        st.info(T["insufficient_growth"])
 
     # --------------------------------------------------
     # Structural Scale — Total Revenue (2021–2024)
@@ -1581,7 +1622,7 @@ st.markdown(
 st.markdown(
     f"""
     <h2 style="margin-bottom:0.6rem; font-size:1.4rem;">
-       Structural Momentum — Market Share Shift
+       {T['momentum_snapshot_title']}
     <div style="font-size:1.0rem; color:#6B7280; margin-top:0.5rem;">
         Growth-Adjusted Market Share Momentum (Latest Year)
     </div>
@@ -1744,7 +1785,7 @@ if not df_momentum_latest.empty:
         """
     )
 else:
-    st.info("Insufficient data to compute market share momentum for the latest year.")
+    st.info(T["insufficient_momentum"])
 
 st.markdown(
     "<hr style='border:none; border-top:2px solid #6B7280; width:100%; margin:3rem 0 2rem 0;'>",
