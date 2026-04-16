@@ -75,30 +75,6 @@ cluster_colors = {
     "1": "#F1BBB6"
 }
 
-fig_map = px.scatter_geo(
-    df,
-    lat="lat",
-    lon="lon",
-    color="cluster_category",
-    hover_name="company",
-    projection="mercator",
-    color_discrete_map=cluster_colors,
-    title="Geographic Distribution of SBR-Registered Operators"
-)
-
-fig_map.update_geos(
-    scope="europe",
-    fitbounds="locations",
-    visible=False
-)
-
-fig_map.update_layout(
-    margin=dict(l=0, r=0, t=40, b=0),
-    legend_title_text="Operator Cluster"
-)
-
-st.plotly_chart(fig_map, use_container_width=True)
-
 st.markdown(
     "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
     unsafe_allow_html=True
