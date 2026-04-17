@@ -20,11 +20,11 @@ st.set_page_config(layout="wide")
 # LANGUAGE SELECTOR (WITH FLAGS)
 # --------------------------------------------------
 
-st.sidebar.markdown("## 🌍 Language / Språk")
+st.sidebar.markdown("### Language - Språk")
 
 lang_display = st.sidebar.selectbox(
     "",
-    options=["English 🇬🇧", "Svenska 🇸🇪"],
+    options=["English", "Svenska"],
     index=0,
     key="language_selector"
 )
