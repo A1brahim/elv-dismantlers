@@ -28,6 +28,25 @@ if metrics is None or len(metrics) == 0:
     st.stop()
 
 
+# Compute last 4 months for display
+df["month"] = pd.to_datetime(df["date"]).dt.to_period("M")
+
+monthly_avg = (
+    df.groupby("month")["price_sek_mwh"]
+    .mean()
+    .sort_index()
+)
+last_4 = monthly_avg.tail(4)
+values = last_4.values
+months = last_4.index
+deltas = [
+    None,
+    values[1] - values[0],
+    values[2] - values[1],
+    values[3] - values[2]
+]
+
+
 # --------------------------------------------------
 # Page Setup
 # --------------------------------------------------
@@ -56,8 +75,35 @@ col2.metric("7d Avg", f"{metrics['avg_7d']:.0f} SEK/MWh")
 col3.metric("30d Avg", f"{metrics['avg_30d']:.0f} SEK/MWh")
 col4.metric("Volatility", f"{metrics['volatility']:.0f} SEK/MWh")
 
+st.divider()
+st.markdown("#### Recent Monthly Averages")
 
-fig = go.Figure()
+display_months = months[1:]
+display_values = values[1:]
+display_deltas = deltas[1:]
+
+col1, col2, col3 = st.columns(3)
+
+for col, month, value, delta in zip(
+    [col1, col2, col3],
+    display_months,
+    display_values,
+    display_deltas
+):
+    col.metric(
+        month.strftime("%b %Y"),
+        f"{value:.0f} SEK/MWh",
+        delta=f"{delta:+.0f}" if delta is not None else None,
+        delta_color="inverse"
+    )
+
+last_delta = display_deltas[-1]
+last_date = df["date"].iloc[-1]
+last_price = df["price_sek_mwh"].iloc[-1]
+
+fig = go.Figure()    
+st.divider()
+
 
 # --- Volatility band (draw first so it's behind) ---
 fig.add_trace(go.Scatter(
