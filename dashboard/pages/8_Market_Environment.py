@@ -140,7 +140,7 @@ fig.add_trace(go.Scatter(
     x=df["date"],
     y=df["trend_30d"],
     mode="lines",
-    line=dict(color="#5A6F89", width=3),
+    line=dict(color="#5A6F89", width=2),
     name="30d Trend",
     hovertemplate="%{x}<br>%{y:.0f} SEK/MWh<extra></extra>"
 ))
@@ -174,7 +174,8 @@ fig.add_annotation(
     y=df["price_sek_mwh"].quantile(0.9),  # better than max
     text="Geopolitical Shock (Feb 2026)",
     showarrow=False,
-    yshift=115,
+    xshift=70,
+    yshift=100,
     font=dict(size=10, color="rgba(0,0,0,0.9)")
 )
 
@@ -202,3 +203,158 @@ st.markdown("""
 Electricity prices exhibit sustained volatility over the past year, with repeated spikes and wide deviations from the underlying trend. 
 This is expected to directly impacts processing and operating margins, particularly for smaller operators. Smaller operators are more exposed to these swings due to limited cost absorption capacity.
 """)
+
+st.markdown(
+    "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
+    unsafe_allow_html=True
+)
+
+
+# -------------------------------
+# Diesel Cost Analysis
+# -------------------------------
+
+from src.metrics.market_data import get_diesel_se, compute_diesel_metrics
+
+diesel_df = get_diesel_se()
+diesel_metrics, diesel_df = compute_diesel_metrics(diesel_df)
+
+st.markdown("#### Fuel Cost (Diesel)")
+
+col_d1, col_d2, col_d3, col_d4 = st.columns(4)
+
+col_d1.metric("Current", f"{diesel_metrics['latest']:.2f} SEK/L")
+col_d2.metric("7d Avg", f"{diesel_metrics['avg_7d']:.2f} SEK/L")
+col_d3.metric("30d Avg", f"{diesel_metrics['avg_30d']:.2f} SEK/L")
+col_d4.metric("Volatility", f"{diesel_metrics['volatility']:.2f} SEK/L")
+
+# Monthly Cards
+diesel_df["month"] = pd.to_datetime(diesel_df["date"]).dt.to_period("M")
+
+monthly_avg_diesel = (
+    diesel_df.groupby("month")["price_sek_litre"]
+    .mean()
+    .sort_index()
+)
+
+last_4_diesel = monthly_avg_diesel.tail(4)
+
+values_d = last_4_diesel.values
+months_d = last_4_diesel.index
+
+deltas_d = [
+    None,
+    values_d[1] - values_d[0],
+    values_d[2] - values_d[1],
+    values_d[3] - values_d[2]
+]
+
+st.markdown("#### Recent Monthly Averages")
+
+col1, col2, col3 = st.columns(3)
+
+for col, month, value, delta in zip(
+    [col1, col2, col3],
+    months_d[1:],
+    values_d[1:],
+    deltas_d[1:]
+):
+    col.metric(
+        month.strftime("%b %Y"),
+        f"{value:.2f} SEK/L",
+        delta=f"{delta:+.2f}" if delta is not None else None,
+        delta_color="inverse"
+    )
+
+# Time Series Plot
+
+fig_diesel = go.Figure()
+
+# Volatility band (same as electricity)
+fig_diesel.add_trace(go.Scatter(
+    x=diesel_df["date"],
+    y=diesel_df["upper"],
+    line=dict(width=0),
+    showlegend=False,
+    hoverinfo="skip"
+))
+
+fig_diesel.add_trace(go.Scatter(
+    x=diesel_df["date"],
+    y=diesel_df["lower"],
+    fill='tonexty',
+    fillcolor='rgba(242, 139, 130, 0.10)',  # ← MATCH electricity
+    line=dict(width=0),
+    name="Volatility Band",
+    hoverinfo="skip"
+))
+
+# Raw price
+fig_diesel.add_trace(go.Scatter(
+    x=diesel_df["date"],
+    y=diesel_df["price_sek_litre"],
+    mode="lines",
+    line=dict(color="#F28B82", width=1),
+    opacity=0.5,
+    name="Price",
+    hovertemplate="%{x}<br>%{y:.2f} SEK/L<extra></extra>"
+))
+
+# Trend
+fig_diesel.add_trace(go.Scatter(
+    x=diesel_df["date"],
+    y=diesel_df["trend_30d"],
+    mode="lines",
+    line=dict(width=2.0, color="#5A6F89"),
+    name="30d Trend",
+    hovertemplate="%{x}<br>%{y:.2f} SEK/L<extra></extra>"
+))
+
+fig_diesel.update_layout(
+    height=420,
+    plot_bgcolor="white",
+    margin=dict(l=20, r=20, t=20, b=20),
+    yaxis_title="SEK/L",
+    xaxis_title="Date",
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    )
+)
+
+fig_diesel.update_xaxes(
+    tickformat="%b %Y",   # Jan 2026
+    dtick="M1",          # monthly ticks
+    gridcolor="rgba(0,0,0,0.05)"
+)
+
+# --- Regime Marker (IRAN Shock) ---
+fig_diesel.add_vline(
+    x="2026-02-28",
+    line_dash="dot",
+    line_color="rgba(0,0,0,0.7)",
+    line_width=2
+)
+
+fig_diesel.add_annotation(
+    x="2026-02-28",
+    y=diesel_df["price_sek_litre"].quantile(0.9),
+    text="Geopolitical Shock (Feb 2026)",
+    showarrow=False,
+    xshift=70,
+    yshift=105,
+    font=dict(size=10, color="rgba(0,0,0,0.9)")
+)
+
+st.plotly_chart(fig_diesel, use_container_width=True, config={"displayModeBar": False})
+
+st.markdown("""
+Diesel costs have structurally increased since February, tightening margins for operators reliant on long-distance transport, particularly those outside urban areas.""")
+
+st.markdown(
+    "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
+    unsafe_allow_html=True
+)
