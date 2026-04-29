@@ -9,7 +9,8 @@ from pathlib import Path
 # Add project root to Python path
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.append(str(ROOT))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 
 # Add project root to Python path (consistent with other dashboard pages)
