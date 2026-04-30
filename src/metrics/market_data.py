@@ -289,24 +289,31 @@ def fetch_metal_prices(days_back=365):
 
     if not dfs:
         return pd.DataFrame()
-
+    
     df = pd.concat(dfs, axis=1)
+
+# --- CRITICAL: ensure expected columns always exist ---
+    expected_cols = ["copper", "aluminium", "steel", "usdsek"]
+    
+    for col in expected_cols:
+        if col not in df.columns:
+            df[col] = np.nan
+
     df = df.reset_index().rename(columns={"Date": "date"})
 
-    # Ensure proper datetime and sorting
+# Ensure proper datetime and sorting
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.sort_values("date")
 
-    # Convert USD metals → SEK (ensure numeric + aligned)
-    if "usdsek" in df.columns:
-        df["usdsek"] = pd.to_numeric(df["usdsek"], errors="coerce")
-        df["copper"] = pd.to_numeric(df["copper"], errors="coerce")
-        df["aluminium"] = pd.to_numeric(df["aluminium"], errors="coerce")
+# Convert all to numeric safely
+    for col in expected_cols:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
-        df["copper_sek"] = df["copper"] * df["usdsek"]
-        df["aluminium_sek"] = df["aluminium"] * df["usdsek"]
+# --- SEK conversion (safe even if NaN) ---
+    df["copper_sek"] = df["copper"] * df["usdsek"]
+    df["aluminium_sek"] = df["aluminium"] * df["usdsek"]
 
-    # Drop rows with missing core values
+# Drop rows where we have no usable copper data
     df = df.dropna(subset=["copper_sek"])
 
     return df
