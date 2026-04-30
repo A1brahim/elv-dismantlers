@@ -23,10 +23,11 @@ st.set_page_config(layout="wide")
 st.sidebar.markdown("#### Language")
 
 lang_display = st.sidebar.selectbox(
-    "",
+    "Language",   # ← required label
     options=["English", "Svenska"],
     index=0,
-    key="language_selector"
+    key="language_selector",
+    label_visibility="collapsed"  # hides the label visually
 )
 
 # Map display label to internal language key
@@ -1044,7 +1045,7 @@ fig.update_layout(
 )
 
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 
 # --------------------------------------------------
