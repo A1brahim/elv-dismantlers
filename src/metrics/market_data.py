@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 import json
 import time
+import yfinance as yf
 
 # --------------------------------------------------
 # CONFIG
@@ -249,3 +250,127 @@ def compute_diesel_metrics(df):
     }
 
     return metrics, df
+
+# --------------------------------------------------
+# METALS (GLOBAL – LME PROXIES)
+# --------------------------------------------------
+
+def fetch_metal_prices(days_back=365):
+    """
+    Returns:
+    date | copper | aluminium | steel_proxy
+    """
+
+    tickers = {
+        "copper": "HG=F",      # Copper futures
+        "aluminium": "ALI=F",  # Aluminium futures
+        "steel": "SLX",         # Steel ETF proxy (good enough for now)
+        "usdsek": "SEK=X"         # USD/SEK exchange rate
+        }
+
+    dfs = []
+
+    for name, ticker in tickers.items():
+        data = yf.download(ticker, period="1y", interval="1d", progress=False)
+
+        if data.empty:
+            continue
+
+        close = data["Close"]
+
+        # yfinance can return either a Series or a single-column DataFrame
+        # depending on version/settings. Force it to a clean Series.
+        if isinstance(close, pd.DataFrame):
+            close = close.iloc[:, 0]
+
+        close = pd.to_numeric(close, errors="coerce")
+        close.name = name
+        dfs.append(close)
+
+    if not dfs:
+        return pd.DataFrame()
+
+    df = pd.concat(dfs, axis=1)
+    df = df.reset_index().rename(columns={"Date": "date"})
+
+    # Ensure proper datetime and sorting
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df = df.sort_values("date")
+
+    # Convert USD metals → SEK (ensure numeric + aligned)
+    if "usdsek" in df.columns:
+        df["usdsek"] = pd.to_numeric(df["usdsek"], errors="coerce")
+        df["copper"] = pd.to_numeric(df["copper"], errors="coerce")
+        df["aluminium"] = pd.to_numeric(df["aluminium"], errors="coerce")
+
+        df["copper_sek"] = df["copper"] * df["usdsek"]
+        df["aluminium_sek"] = df["aluminium"] * df["usdsek"]
+
+    # Drop rows with missing core values
+    df = df.dropna(subset=["copper_sek"])
+
+    return df
+
+# --------------------------------------------------
+# METALS Get Data 
+# --------------------------------------------------
+
+def get_metal_prices(force_refresh=False):
+    df = fetch_metal_prices()
+
+    if df is None or df.empty:
+        return pd.DataFrame()
+
+    return df
+
+# --------------------------------------------------
+# METALS Compute Metrics
+# --------------------------------------------------
+
+
+def compute_metal_metrics(df):
+    if df.empty:
+        return {}, df
+
+    df = df.copy()
+    df = df.sort_values("date")
+
+    # Clean series before calculations
+    df = df.dropna(subset=["copper_sek"])
+
+    # Focus on copper first (can expand later)
+    series = pd.to_numeric(df["copper_sek"], errors="coerce")
+    df["copper_sek"] = series
+
+    # Rolling structure
+    df["trend_30d"] = series.rolling(30).mean()
+    df["vol_30d"] = series.rolling(30).std()
+
+    df["upper"] = df["trend_30d"] + df["vol_30d"]
+    df["lower"] = df["trend_30d"] - df["vol_30d"]
+
+    # Metrics
+    latest = series.iloc[-1]
+    prev = series.iloc[-2] if len(series) > 1 else None
+    change = latest - prev if prev is not None else None
+
+    avg_7d = series.tail(7).mean()
+    avg_30d = series.tail(30).mean()
+    volatility = series.tail(30).std()
+
+    prev_30d = series.tail(60).head(30).mean()
+
+    trend = None
+    if pd.notna(prev_30d) and prev_30d != 0:
+        trend = (avg_30d - prev_30d) / prev_30d
+
+    metrics = {
+        "latest": float(round(latest, 2)),
+        "change": float(round(change, 2)) if change is not None else None,
+        "avg_7d": float(round(avg_7d, 2)),
+        "avg_30d": float(round(avg_30d, 2)),
+        "volatility": float(round(volatility, 2)),
+        "trend": float(trend) if trend is not None else None
+        }
+
+    return metrics, df[["date", "copper_sek", "trend_30d", "vol_30d", "upper", "lower"]]
