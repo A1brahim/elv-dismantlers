@@ -521,14 +521,19 @@ st.markdown("#### Scrap Metal Prices – Aluminium (SEK/tonne, LME Futures)")
 st.caption("Source: Yahoo Finance (ALI=F), converted using USD/SEK FX")
 
 # --- Metrics ---
-series_al = metal_df["aluminium_sek"]
+if "aluminium_sek" not in metal_df.columns:
+    st.warning("Aluminium data currently unavailable (data source issue).")
+else:
+    series_al = metal_df["aluminium_sek"]
 
-col_a1, col_a2, col_a3, col_a4 = st.columns(4)
+    # --- Metrics ---
+    col_a1, col_a2, col_a3, col_a4 = st.columns(4)
 
-col_a1.metric("Current", f"{series_al.iloc[-1]:,.0f} SEK")
-col_a2.metric("7d Avg", f"{series_al.tail(7).mean():,.0f} SEK")
-col_a3.metric("30d Avg", f"{series_al.tail(30).mean():,.0f} SEK")
-col_a4.metric("Volatility", f"{series_al.tail(30).std():,.0f}")
+    col_a1.metric("Current", f"{series_al.iloc[-1]:,.0f} SEK")
+    col_a2.metric("7d Avg", f"{series_al.tail(7).mean():,.0f} SEK")
+    col_a3.metric("30d Avg", f"{series_al.tail(30).mean():,.0f} SEK")
+    col_a4.metric("Volatility", f"{series_al.tail(30).std():,.0f}")
+
 
 # --- Monthly cards ---
 metal_df["month"] = pd.to_datetime(metal_df["date"]).dt.to_period("M")
