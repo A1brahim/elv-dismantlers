@@ -513,16 +513,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# -------------------------------
-# Scrap Metal Prices – Aluminium
-# -------------------------------
-
 st.markdown("#### Scrap Metal Prices – Aluminium (SEK/tonne, LME Futures)")
 st.caption("Source: Yahoo Finance (ALI=F), converted using USD/SEK FX")
 
-# --- Metrics ---
 if "aluminium_sek" not in metal_df.columns:
     st.warning("Aluminium data currently unavailable (data source issue).")
+
 else:
     series_al = metal_df["aluminium_sek"]
 
@@ -534,135 +530,82 @@ else:
     col_a3.metric("30d Avg", f"{series_al.tail(30).mean():,.0f} SEK")
     col_a4.metric("Volatility", f"{series_al.tail(30).std():,.0f}")
 
+    # --- Monthly ---
+    metal_df["month"] = pd.to_datetime(metal_df["date"]).dt.to_period("M")
 
-# --- Monthly cards ---
-metal_df["month"] = pd.to_datetime(metal_df["date"]).dt.to_period("M")
-
-monthly_avg_al = (
-    metal_df.groupby("month")["aluminium_sek"]
-    .mean()
-    .sort_index()
-)
-
-last_4_al = monthly_avg_al.tail(4)
-
-values_al = last_4_al.values
-months_al = last_4_al.index
-
-deltas_al = [
-    None,
-    values_al[1] - values_al[0],
-    values_al[2] - values_al[1],
-    values_al[3] - values_al[2]
-]
-
-st.markdown("#### Recent Monthly Averages")
-
-col1, col2, col3 = st.columns(3)
-
-for col, month, value, delta in zip(
-    [col1, col2, col3],
-    months_al[1:],
-    values_al[1:],
-    deltas_al[1:]
-):
-    col.metric(
-        month.strftime("%b %Y"),
-        f"{value:.0f}",
-        delta=f"{delta:+.0f}" if delta is not None else None,
-        delta_color="inverse"
+    monthly_avg_al = (
+        metal_df.groupby("month")["aluminium_sek"]
+        .mean()
+        .sort_index()
     )
 
-# --- Compute rolling metrics (IMPORTANT: separate from copper) ---
-trend_al = series_al.rolling(30, min_periods=10).mean()
-vol_al = series_al.rolling(30, min_periods=10).std()
+    last_4_al = monthly_avg_al.tail(4)
 
-upper_al = trend_al + vol_al
-lower_al = trend_al - vol_al
+    values_al = last_4_al.values
+    months_al = last_4_al.index
 
-# --- Plot ---
-fig_al = go.Figure()
+    deltas_al = [
+        None,
+        values_al[1] - values_al[0],
+        values_al[2] - values_al[1],
+        values_al[3] - values_al[2]
+    ]
 
-# Volatility band
-fig_al.add_trace(go.Scatter(
-    x=metal_df["date"],
-    y=upper_al,
-    line=dict(width=0),
-    showlegend=False,
-    hoverinfo="skip"
-))
+    st.markdown("#### Recent Monthly Averages")
 
-fig_al.add_trace(go.Scatter(
-    x=metal_df["date"],
-    y=lower_al,
-    fill='tonexty',
-    fillcolor='rgba(242, 139, 130, 0.10)',
-    line=dict(width=0),
-    name="Volatility Band",
-    hoverinfo="skip"
-))
+    col1, col2, col3 = st.columns(3)
 
-# Raw price
-fig_al.add_trace(go.Scatter(
-    x=metal_df["date"],
-    y=series_al,
-    mode="lines",
-    line=dict(color="#F28B82", width=1),
-    opacity=0.5,
-    name="Price",
-    hovertemplate="%{x}<br>%{y:.0f} SEK/tonne<extra></extra>"
-))
+    for col, month, value, delta in zip(
+        [col1, col2, col3],
+        months_al[1:],
+        values_al[1:],
+        deltas_al[1:]
+    ):
+        col.metric(
+            month.strftime("%b %Y"),
+            f"{value:.0f}",
+            delta=f"{delta:+.0f}" if delta is not None else None,
+            delta_color="inverse"
+        )
 
-# Trend
-fig_al.add_trace(go.Scatter(
-    x=metal_df["date"],
-    y=trend_al,
-    mode="lines",
-    line=dict(color="#5A6F89", width=2),
-    name="30d Trend",
-    hovertemplate="%{x}<br>%{y:.0f} SEK/tonne<extra></extra>"
-))
+    # --- Rolling ---
+    trend_al = series_al.rolling(30, min_periods=10).mean()
+    vol_al = series_al.rolling(30, min_periods=10).std()
 
-fig_al.update_layout(
-    height=420,
-    plot_bgcolor="white",
-    margin=dict(l=20, r=20, t=20, b=20),
-    yaxis_title="SEK/tonne",
-    xaxis_title="Date",
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="right",
-        x=1
-    )
-)
+    upper_al = trend_al + vol_al
+    lower_al = trend_al - vol_al
 
-fig_al.update_xaxes(
-    tickformat="%b %Y",
-    dtick="M1",
-    gridcolor="rgba(0,0,0,0.05)"
-)
+    # --- Plot ---
+    fig_al = go.Figure()
 
-# --- Regime marker (same as others for consistency) ---
-fig_al.add_vline(
-    x="2026-02-28",
-    line_dash="dot",
-    line_color="rgba(0,0,0,0.7)",
-    line_width=2
-)
+    fig_al.add_trace(go.Scatter(
+        x=metal_df["date"], y=upper_al, line=dict(width=0), showlegend=False
+    ))
 
-fig_al.add_annotation(
-    x="2026-02-28",
-    y=series_al.quantile(0.9),
-    text="Geopolitical Shock (Feb 2026)",
-    showarrow=False,
-    xshift=70,
-    yshift=105,
-    font=dict(size=10, color="rgba(0,0,0,0.9)")
-)
+    fig_al.add_trace(go.Scatter(
+        x=metal_df["date"], y=lower_al,
+        fill='tonexty',
+        fillcolor='rgba(242, 139, 130, 0.10)',
+        line=dict(width=0),
+        name="Volatility Band"
+    ))
 
-st.plotly_chart(fig_al, width="stretch", config={"displayModeBar": False})
+    fig_al.add_trace(go.Scatter(
+        x=metal_df["date"], y=series_al,
+        mode="lines",
+        line=dict(color="#F28B82", width=1),
+        opacity=0.5,
+        name="Price"
+    ))
+
+    fig_al.add_trace(go.Scatter(
+        x=metal_df["date"], y=trend_al,
+        mode="lines",
+        line=dict(color="#5A6F89", width=2),
+        name="30d Trend"
+    ))
+
+    st.plotly_chart(fig_al, width="stretch")
 
 st.markdown("""
 Aluminium prices show more gradual and stable movements compared to copper, reflecting their role as a lower-margin, volume-driven revenue component. This provides some revenue stability, though with less upside sensitivity.
