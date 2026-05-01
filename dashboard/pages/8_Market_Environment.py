@@ -377,10 +377,10 @@ st.caption("Source: Yahoo Finance (COMEX Copper Futures 'HG=F', converted to SEK
 
 col_m1, col_m2, col_m3, col_m4 = st.columns(4)
 
-col_m1.metric("Current", f"{metal_metrics['latest']:.2f} SEK")
-col_m2.metric("7d Avg", f"{metal_metrics['avg_7d']:.2f} SEK")
-col_m3.metric("30d Avg", f"{metal_metrics['avg_30d']:.2f} SEK")
-col_m4.metric("Volatility", f"{metal_metrics['volatility']:.2f}")
+col_m1.metric("Current", f"{metal_metrics['latest']:,.2f} SEK")
+col_m2.metric("7d Avg", f"{metal_metrics['avg_7d']:,.2f} SEK")
+col_m3.metric("30d Avg", f"{metal_metrics['avg_30d']:,.2f} SEK")
+col_m4.metric("Volatility", f"{metal_metrics['volatility']:,.2f}")
 
 # Monthly cards
 metal_df["month"] = pd.to_datetime(metal_df["date"]).dt.to_period("M")
@@ -506,4 +506,159 @@ st.plotly_chart(fig_metal, use_container_width=True, config={"displayModeBar": F
 
 st.markdown("""
 Copper prices show moderate upward momentum with relatively contained volatility, suggesting stable revenue conditions compared to the more volatile cost environment.
+""")
+
+st.markdown(
+    "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
+    unsafe_allow_html=True
+)
+
+# -------------------------------
+# Scrap Metal Prices – Aluminium
+# -------------------------------
+
+st.markdown("#### Scrap Metal Prices – Aluminium (SEK/tonne, LME Futures)")
+st.caption("Source: Yahoo Finance (ALI=F), converted using USD/SEK FX")
+
+# --- Metrics ---
+series_al = metal_df["aluminium_sek"]
+
+col_a1, col_a2, col_a3, col_a4 = st.columns(4)
+
+col_a1.metric("Current", f"{series_al.iloc[-1]:,.0f} SEK")
+col_a2.metric("7d Avg", f"{series_al.tail(7).mean():,.0f} SEK")
+col_a3.metric("30d Avg", f"{series_al.tail(30).mean():,.0f} SEK")
+col_a4.metric("Volatility", f"{series_al.tail(30).std():,.0f}")
+
+# --- Monthly cards ---
+metal_df["month"] = pd.to_datetime(metal_df["date"]).dt.to_period("M")
+
+monthly_avg_al = (
+    metal_df.groupby("month")["aluminium_sek"]
+    .mean()
+    .sort_index()
+)
+
+last_4_al = monthly_avg_al.tail(4)
+
+values_al = last_4_al.values
+months_al = last_4_al.index
+
+deltas_al = [
+    None,
+    values_al[1] - values_al[0],
+    values_al[2] - values_al[1],
+    values_al[3] - values_al[2]
+]
+
+st.markdown("#### Recent Monthly Averages")
+
+col1, col2, col3 = st.columns(3)
+
+for col, month, value, delta in zip(
+    [col1, col2, col3],
+    months_al[1:],
+    values_al[1:],
+    deltas_al[1:]
+):
+    col.metric(
+        month.strftime("%b %Y"),
+        f"{value:.0f}",
+        delta=f"{delta:+.0f}" if delta is not None else None,
+        delta_color="inverse"
+    )
+
+# --- Compute rolling metrics (IMPORTANT: separate from copper) ---
+trend_al = series_al.rolling(30, min_periods=10).mean()
+vol_al = series_al.rolling(30, min_periods=10).std()
+
+upper_al = trend_al + vol_al
+lower_al = trend_al - vol_al
+
+# --- Plot ---
+fig_al = go.Figure()
+
+# Volatility band
+fig_al.add_trace(go.Scatter(
+    x=metal_df["date"],
+    y=upper_al,
+    line=dict(width=0),
+    showlegend=False,
+    hoverinfo="skip"
+))
+
+fig_al.add_trace(go.Scatter(
+    x=metal_df["date"],
+    y=lower_al,
+    fill='tonexty',
+    fillcolor='rgba(242, 139, 130, 0.10)',
+    line=dict(width=0),
+    name="Volatility Band",
+    hoverinfo="skip"
+))
+
+# Raw price
+fig_al.add_trace(go.Scatter(
+    x=metal_df["date"],
+    y=series_al,
+    mode="lines",
+    line=dict(color="#F28B82", width=1),
+    opacity=0.5,
+    name="Price",
+    hovertemplate="%{x}<br>%{y:.0f} SEK/tonne<extra></extra>"
+))
+
+# Trend
+fig_al.add_trace(go.Scatter(
+    x=metal_df["date"],
+    y=trend_al,
+    mode="lines",
+    line=dict(color="#5A6F89", width=2),
+    name="30d Trend",
+    hovertemplate="%{x}<br>%{y:.0f} SEK/tonne<extra></extra>"
+))
+
+fig_al.update_layout(
+    height=420,
+    plot_bgcolor="white",
+    margin=dict(l=20, r=20, t=20, b=20),
+    yaxis_title="SEK/tonne",
+    xaxis_title="Date",
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    )
+)
+
+fig_al.update_xaxes(
+    tickformat="%b %Y",
+    dtick="M1",
+    gridcolor="rgba(0,0,0,0.05)"
+)
+
+# --- Regime marker (same as others for consistency) ---
+fig_al.add_vline(
+    x="2026-02-28",
+    line_dash="dot",
+    line_color="rgba(0,0,0,0.7)",
+    line_width=2
+)
+
+fig_al.add_annotation(
+    x="2026-02-28",
+    y=series_al.quantile(0.9),
+    text="Geopolitical Shock (Feb 2026)",
+    showarrow=False,
+    xshift=70,
+    yshift=105,
+    font=dict(size=10, color="rgba(0,0,0,0.9)")
+)
+
+st.plotly_chart(fig_al, width="stretch", config={"displayModeBar": False})
+
+st.markdown("""
+Aluminium prices show more gradual and stable movements compared to copper, reflecting their role as a lower-margin, volume-driven revenue component. This provides some revenue stability, though with less upside sensitivity.
 """)

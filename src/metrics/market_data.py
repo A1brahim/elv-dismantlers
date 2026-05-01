@@ -128,8 +128,8 @@ def compute_electricity_metrics(df):
     # -------------------------------
     # Time-series structure
     # -------------------------------
-    df["trend_30d"] = df["price_sek_mwh"].rolling(30).mean()
-    df["vol_30d"] = df["price_sek_mwh"].rolling(30).std()
+    df["trend_30d"] = df["price_sek_mwh"].rolling(20).mean()
+    df["vol_30d"] = df["price_sek_mwh"].rolling(20).std()
 
     df["upper"] = df["trend_30d"] + df["vol_30d"]
     df["lower"] = df["trend_30d"] - df["vol_30d"]
@@ -215,8 +215,8 @@ def compute_diesel_metrics(df):
     # -------------------------------
     # Time-series structure
     # -------------------------------
-    df["trend_30d"] = df["price_sek_litre"].rolling(30).mean()
-    df["vol_30d"] = df["price_sek_litre"].rolling(30).std()
+    df["trend_30d"] = df["price_sek_litre"].rolling(30, min_periods=20).mean()
+    df["vol_30d"] = df["price_sek_litre"].rolling(30, min_periods=20).std()
 
     df["upper"] = df["trend_30d"] + df["vol_30d"]
     df["lower"] = df["trend_30d"] - df["vol_30d"]
@@ -342,16 +342,22 @@ def compute_metal_metrics(df):
     df = df.copy()
     df = df.sort_values("date")
 
-    # Clean series before calculations
+    # Ensure required columns exist
+    if "copper_sek" not in df.columns:
+        return {}, pd.DataFrame()
+
+    if "aluminium_sek" not in df.columns:
+        df["aluminium_sek"] = np.nan
+
+    # Clean copper series before calculations
     df = df.dropna(subset=["copper_sek"])
 
-    # Focus on copper first (can expand later)
     series = pd.to_numeric(df["copper_sek"], errors="coerce")
     df["copper_sek"] = series
 
-    # Rolling structure
-    df["trend_30d"] = series.rolling(30).mean()
-    df["vol_30d"] = series.rolling(30).std()
+    # Rolling structure for copper
+    df["trend_30d"] = series.rolling(30, min_periods=10).mean()
+    df["vol_30d"] = series.rolling(30, min_periods=10).std()
 
     df["upper"] = df["trend_30d"] + df["vol_30d"]
     df["lower"] = df["trend_30d"] - df["vol_30d"]
@@ -378,6 +384,16 @@ def compute_metal_metrics(df):
         "avg_30d": float(round(avg_30d, 2)),
         "volatility": float(round(volatility, 2)),
         "trend": float(trend) if trend is not None else None
-        }
+    }
 
-    return metrics, df[["date", "copper_sek", "trend_30d", "vol_30d", "upper", "lower"]]
+    return metrics, df[
+        [
+            "date",
+            "copper_sek",
+            "aluminium_sek",
+            "trend_30d",
+            "vol_30d",
+            "upper",
+            "lower"
+        ]
+    ]
