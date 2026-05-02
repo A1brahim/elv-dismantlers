@@ -197,7 +197,7 @@ fig.update_xaxes(
 
 
 
-st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
 
 st.markdown("""
 Electricity prices exhibit sustained volatility over the past year, with repeated spikes and wide deviations from the underlying trend. 
@@ -350,7 +350,7 @@ fig_diesel.add_annotation(
     font=dict(size=10, color="rgba(0,0,0,0.9)")
 )
 
-st.plotly_chart(fig_diesel, use_container_width=True, config={"displayModeBar": False})
+st.plotly_chart(fig_diesel, width="stretch", config={"displayModeBar": False})
 
 st.markdown("""
 Diesel costs have structurally increased since 28 February, tightening margins for operators reliant on long-distance transport, particularly those outside urban areas.""")
@@ -502,7 +502,7 @@ fig_metal.add_annotation(
     font=dict(size=10, color="rgba(0,0,0,0.9)")
 )
 
-st.plotly_chart(fig_metal, use_container_width=True, config={"displayModeBar": False})
+st.plotly_chart(fig_metal, width="stretch", config={"displayModeBar": False})
 
 st.markdown("""
 Copper prices show moderate upward momentum with relatively contained volatility, suggesting stable revenue conditions compared to the more volatile cost environment.
@@ -664,7 +664,7 @@ fig_al.add_annotation(
     font=dict(size=10, color="rgba(0,0,0,0.9)")
 )
 
-st.plotly_chart(fig_al, use_container_width=True, config={"displayModeBar": False})
+st.plotly_chart(fig_al, width="stretch", config={"displayModeBar": False})
 
 st.markdown("""
 Aluminium prices show more gradual and stable movements compared to copper, reflecting their role as a lower-margin, volume-driven revenue component. This provides some revenue stability, though with less upside sensitivity.
@@ -682,11 +682,19 @@ st.caption(
     "It should be interpreted as a directional ferrous-market indicator for ELV economics, not as Swedish yard-level scrap pricing."
 )
 
-if "ferrous_proxy_sek" not in metal_df.columns:
-    st.warning("Ferrous scrap proxy data currently unavailable.")
+ferrous_col = None
+
+for candidate in ["steel_hrc_nw_europe_sek", "ferrous_proxy_sek"]:
+    if candidate in metal_df.columns and metal_df[candidate].notna().any():
+        ferrous_col = candidate
+        break
+
+if ferrous_col is None:
+    st.warning("LME steel HRC NW Europe data currently unavailable.")
 
 else:
-    series_fe = metal_df["ferrous_proxy_sek"]
+    ferrous_df = metal_df.dropna(subset=[ferrous_col]).copy()
+    series_fe = ferrous_df[ferrous_col]
 
     # --- Metrics ---
     col_f1, col_f2, col_f3, col_f4 = st.columns(4)
@@ -697,10 +705,10 @@ else:
     col_f4.metric("Volatility", f"{series_fe.tail(30).std():,.0f}")
 
     # --- Monthly ---
-    metal_df["month"] = pd.to_datetime(metal_df["date"]).dt.to_period("M")
+    ferrous_df["month"] = pd.to_datetime(ferrous_df["date"]).dt.to_period("M")
 
     monthly_avg_fe = (
-        metal_df.groupby("month")["ferrous_proxy_sek"]
+        ferrous_df.groupby("month")[ferrous_col]
         .mean()
         .sort_index()
     )
@@ -745,7 +753,7 @@ else:
     fig_fe = go.Figure()
 
     fig_fe.add_trace(go.Scatter(
-        x=metal_df["date"],
+        x=ferrous_df["date"],
         y=upper_fe,
         line=dict(width=0),
         showlegend=False,
@@ -753,7 +761,7 @@ else:
     ))
 
     fig_fe.add_trace(go.Scatter(
-        x=metal_df["date"],
+        x=ferrous_df["date"],
         y=lower_fe,
         fill="tonexty",
         fillcolor="rgba(242, 139, 130, 0.10)",
@@ -763,7 +771,7 @@ else:
     ))
 
     fig_fe.add_trace(go.Scatter(
-        x=metal_df["date"],
+        x=ferrous_df["date"],
         y=series_fe,
         mode="lines",
         line=dict(color="#F28B82", width=1),
@@ -773,7 +781,7 @@ else:
     ))
 
     fig_fe.add_trace(go.Scatter(
-        x=metal_df["date"],
+        x=ferrous_df["date"],
         y=trend_fe,
         mode="lines",
         line=dict(color="#5A6F89", width=2),
@@ -785,7 +793,7 @@ else:
         height=420,
         plot_bgcolor="white",
         margin=dict(l=20, r=20, t=20, b=20),
-        yaxis_title="SEK",
+        yaxis_title="SEK/tonne",
         xaxis_title="Date",
         legend=dict(
             orientation="h",
@@ -824,7 +832,7 @@ else:
         font=dict(size=10, color="rgba(0,0,0,0.9)")
     )
 
-    st.plotly_chart(fig_fe, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig_fe, width="stretch", config={"displayModeBar": False})
 
 st.markdown("""
 Ferrous material is likely to represent the bulk-volume revenue component in ELV dismantling. 
