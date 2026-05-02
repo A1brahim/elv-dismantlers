@@ -72,10 +72,10 @@ st.caption("Source: Nord Pool Spot Prices (via Elprisetjustnu API)")
 
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric("Current", f"{metrics['latest']:.0f} SEK/MWh")
-col2.metric("7d Avg", f"{metrics['avg_7d']:.0f} SEK/MWh")
-col3.metric("30d Avg", f"{metrics['avg_30d']:.0f} SEK/MWh")
-col4.metric("Volatility", f"{metrics['volatility']:.0f} SEK/MWh")
+col1.metric("Current", f"{metrics['latest']:,.0f} SEK/MWh")
+col2.metric("7d Avg", f"{metrics['avg_7d']:,.0f} SEK/MWh")
+col3.metric("30d Avg", f"{metrics['avg_30d']:,.0f} SEK/MWh")
+col4.metric("Volatility", f"{metrics['volatility']:,.0f} SEK/MWh")
 
 st.markdown("#### Recent Monthly Averages")
 
@@ -93,8 +93,8 @@ for col, month, value, delta in zip(
 ):
     col.metric(
         month.strftime("%b %Y"),
-        f"{value:.0f} SEK/MWh",
-        delta=f"{delta:+.0f}" if delta is not None else None,
+        f"{value:,.0f} SEK/MWh",
+        delta=f"{delta:+,.0f}" if delta is not None else None,
         delta_color="inverse"
     )
 
@@ -132,7 +132,7 @@ fig.add_trace(go.Scatter(
     line=dict(color="#F28B82", width=1),
     opacity=0.5,
     name="Price",
-    hovertemplate="%{x}<br>%{y:.0f} SEK/MWh<extra></extra>"
+    hovertemplate="%{x}<br>%{y:,.0f} SEK/MWh<extra></extra>"
 ))
 
 # --- Trend line (main signal) ---
@@ -172,7 +172,7 @@ fig.add_vline(
 fig.add_annotation(
     x="2026-02-28",
     y=df["price_sek_mwh"].quantile(0.9),  # better than max
-    text="Geopolitical Shock (Feb 2026)",
+    text="Geopolitical Shock (28 Feb 2026)",
     showarrow=False,
     xshift=70,
     yshift=100,
@@ -343,7 +343,7 @@ fig_diesel.add_vline(
 fig_diesel.add_annotation(
     x="2026-02-28",
     y=diesel_df["price_sek_litre"].quantile(0.9),
-    text="Geopolitical Shock (Feb 2026)",
+    text="Geopolitical Shock (28 Feb 2026)",
     showarrow=False,
     xshift=70,
     yshift=105,
@@ -353,7 +353,7 @@ fig_diesel.add_annotation(
 st.plotly_chart(fig_diesel, use_container_width=True, config={"displayModeBar": False})
 
 st.markdown("""
-Diesel costs have structurally increased since February, tightening margins for operators reliant on long-distance transport, particularly those outside urban areas.""")
+Diesel costs have structurally increased since 28 February, tightening margins for operators reliant on long-distance transport, particularly those outside urban areas.""")
 
 
 st.markdown(
@@ -495,7 +495,7 @@ fig_metal.add_vline(
 fig_metal.add_annotation(
     x="2026-02-28",
     y=metal_df["copper_sek"].quantile(0.9),
-    text="Geopolitical Shock (Feb 2026)",
+    text="Geopolitical Shock (28 Feb 2026)",
     showarrow=False,
     xshift=70,
     yshift=105,
@@ -563,8 +563,8 @@ else:
     ):
         col.metric(
             month.strftime("%b %Y"),
-            f"{value:.0f}",
-            delta=f"{delta:+.0f}" if delta is not None else None,
+            f"{value:,.0f}",
+            delta=f"{delta:+,.0f}" if delta is not None else None,
             delta_color="inverse"
         )
 
@@ -583,29 +583,88 @@ else:
     ))
 
     fig_al.add_trace(go.Scatter(
-        x=metal_df["date"], y=lower_al,
-        fill='tonexty',
-        fillcolor='rgba(242, 139, 130, 0.10)',
-        line=dict(width=0),
-        name="Volatility Band"
-    ))
-
-    fig_al.add_trace(go.Scatter(
-        x=metal_df["date"], y=series_al,
+        x=metal_df["date"],
+        y=series_al,
         mode="lines",
         line=dict(color="#F28B82", width=1),
         opacity=0.5,
-        name="Price"
-    ))
+        name="Price",
+        hovertemplate="%{x}<br>%{y:,.0f} SEK<extra></extra>"
+        ))
 
     fig_al.add_trace(go.Scatter(
-        x=metal_df["date"], y=trend_al,
-        mode="lines",
-        line=dict(color="#5A6F89", width=2),
-        name="30d Trend"
+        x=metal_df["date"],
+        y=upper_al,
+        line=dict(width=0),
+        showlegend=False,
+        hoverinfo="skip"
+    ))
+    
+    fig_al.add_trace(go.Scatter(
+        x=metal_df["date"],
+        y=lower_al,
+        fill='tonexty',
+        fillcolor='rgba(242, 139, 130, 0.10)',
+        line=dict(width=0),
+        name="Volatility Band",
+        hoverinfo="skip"
     ))
 
-    st.plotly_chart(fig_al, width="stretch")
+    # 30d trend
+    fig_al.add_trace(go.Scatter(
+        x=metal_df["date"],
+        y=trend_al,
+        mode="lines",
+        line=dict(color="#5A6F89", width=2),
+        name="30d Trend",
+        hovertemplate="%{x}<br>%{y:,.0f} SEK<extra></extra>"
+        ))
+
+# --- Layout ---
+fig_al.update_layout(
+    height=420,
+    plot_bgcolor="white",
+    margin=dict(l=20, r=20, t=20, b=20),
+    yaxis_title="SEK/tonne",
+    xaxis_title="Date",
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    )
+)
+
+fig_al.update_xaxes(
+    tickformat="%b %Y",
+    dtick="M1",
+    gridcolor="rgba(0,0,0,0.05)"
+)
+
+fig_al.update_yaxes(
+    gridcolor="rgba(0,0,0,0.05)"
+)
+
+# --- Regime Marker ---
+fig_al.add_vline(
+    x="2026-02-28",
+    line_dash="dot",
+    line_color="rgba(0,0,0,0.7)",
+    line_width=2
+)
+
+fig_al.add_annotation(
+    x="2026-02-28",
+    y=series_al.quantile(0.9),
+    text="Geopolitical Shock (28 Feb 2026)",
+    showarrow=False,
+    xshift=70,
+    yshift=105,
+    font=dict(size=10, color="rgba(0,0,0,0.9)")
+)
+
+st.plotly_chart(fig_al, use_container_width=True, config={"displayModeBar": False})
 
 st.markdown("""
 Aluminium prices show more gradual and stable movements compared to copper, reflecting their role as a lower-margin, volume-driven revenue component. This provides some revenue stability, though with less upside sensitivity.
