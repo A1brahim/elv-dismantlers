@@ -371,7 +371,7 @@ from src.metrics.market_data import get_metal_prices, compute_metal_metrics
 metal_df = get_metal_prices()
 metal_metrics, metal_df = compute_metal_metrics(metal_df)
 
-st.markdown("#### Scrap Metal Prices Copper (COMEX Futures, SEK)")
+st.markdown("#### Scrap Metal Prices: Copper (COMEX Futures, SEK)")
 st.caption("Source: Yahoo Finance (COMEX Copper Futures 'HG=F', converted to SEK via USD/SEK)")
 
 
@@ -513,7 +513,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown("#### Scrap Metal Prices – Aluminium (SEK/tonne, LME Futures)")
+st.markdown("#### Scrap Metal Prices: Aluminium (SEK/tonne, LME Futures)")
 st.caption("Source: Yahoo Finance (ALI=F), converted using USD/SEK FX")
 
 if "aluminium_sek" not in metal_df.columns:
@@ -668,4 +668,166 @@ st.plotly_chart(fig_al, use_container_width=True, config={"displayModeBar": Fals
 
 st.markdown("""
 Aluminium prices show more gradual and stable movements compared to copper, reflecting their role as a lower-margin, volume-driven revenue component. This provides some revenue stability, though with less upside sensitivity.
+""")
+
+st.markdown(
+    "<hr style='border:none; border-top:2px solid #9CA3AF; width:100%; margin:2.5rem 0;'>",
+    unsafe_allow_html=True
+)
+
+st.markdown("#### Ferrous Market Price: LME Steel HRC NW Europe (Argus, SEK/tonne)")
+st.caption(
+    "Source: LME Steel HRC NW Europe (Argus), converted from USD/tonne to SEK/tonne using USD/SEK FX. "
+    "This is a real European HRC steel market price series. "
+    "It should be interpreted as a directional ferrous-market indicator for ELV economics, not as Swedish yard-level scrap pricing."
+)
+
+if "ferrous_proxy_sek" not in metal_df.columns:
+    st.warning("Ferrous scrap proxy data currently unavailable.")
+
+else:
+    series_fe = metal_df["ferrous_proxy_sek"]
+
+    # --- Metrics ---
+    col_f1, col_f2, col_f3, col_f4 = st.columns(4)
+
+    col_f1.metric("Current", f"{series_fe.iloc[-1]:,.0f} SEK")
+    col_f2.metric("7d Avg", f"{series_fe.tail(7).mean():,.0f} SEK")
+    col_f3.metric("30d Avg", f"{series_fe.tail(30).mean():,.0f} SEK")
+    col_f4.metric("Volatility", f"{series_fe.tail(30).std():,.0f}")
+
+    # --- Monthly ---
+    metal_df["month"] = pd.to_datetime(metal_df["date"]).dt.to_period("M")
+
+    monthly_avg_fe = (
+        metal_df.groupby("month")["ferrous_proxy_sek"]
+        .mean()
+        .sort_index()
+    )
+
+    last_4_fe = monthly_avg_fe.tail(4)
+
+    values_fe = last_4_fe.values
+    months_fe = last_4_fe.index
+
+    deltas_fe = [
+        None,
+        values_fe[1] - values_fe[0],
+        values_fe[2] - values_fe[1],
+        values_fe[3] - values_fe[2]
+    ]
+
+    st.markdown("#### Recent Monthly Averages")
+
+    col1, col2, col3 = st.columns(3)
+
+    for col, month, value, delta in zip(
+        [col1, col2, col3],
+        months_fe[1:],
+        values_fe[1:],
+        deltas_fe[1:]
+    ):
+        col.metric(
+            month.strftime("%b %Y"),
+            f"{value:,.0f}",
+            delta=f"{delta:+.0f}" if delta is not None else None,
+            delta_color="inverse"
+        )
+
+    # --- Rolling ---
+    trend_fe = series_fe.rolling(30, min_periods=10).mean()
+    vol_fe = series_fe.rolling(30, min_periods=10).std()
+
+    upper_fe = trend_fe + vol_fe
+    lower_fe = trend_fe - vol_fe
+
+    # --- Plot ---
+    fig_fe = go.Figure()
+
+    fig_fe.add_trace(go.Scatter(
+        x=metal_df["date"],
+        y=upper_fe,
+        line=dict(width=0),
+        showlegend=False,
+        hoverinfo="skip"
+    ))
+
+    fig_fe.add_trace(go.Scatter(
+        x=metal_df["date"],
+        y=lower_fe,
+        fill="tonexty",
+        fillcolor="rgba(242, 139, 130, 0.10)",
+        line=dict(width=0),
+        name="Volatility Band",
+        hoverinfo="skip"
+    ))
+
+    fig_fe.add_trace(go.Scatter(
+        x=metal_df["date"],
+        y=series_fe,
+        mode="lines",
+        line=dict(color="#F28B82", width=1),
+        opacity=0.5,
+        name="Price",
+        hovertemplate="%{x}<br>%{y:,.0f} SEK<extra></extra>"
+    ))
+
+    fig_fe.add_trace(go.Scatter(
+        x=metal_df["date"],
+        y=trend_fe,
+        mode="lines",
+        line=dict(color="#5A6F89", width=2),
+        name="30d Trend",
+        hovertemplate="%{x}<br>%{y:,.0f} SEK<extra></extra>"
+    ))
+
+    fig_fe.update_layout(
+        height=420,
+        plot_bgcolor="white",
+        margin=dict(l=20, r=20, t=20, b=20),
+        yaxis_title="SEK",
+        xaxis_title="Date",
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    fig_fe.update_xaxes(
+        tickformat="%b %Y",
+        dtick="M1",
+        gridcolor="rgba(0,0,0,0.05)"
+    )
+
+    fig_fe.update_yaxes(
+        gridcolor="rgba(0,0,0,0.05)"
+    )
+
+    # --- Regime Marker ---
+    fig_fe.add_vline(
+        x="2026-02-28",
+        line_dash="dot",
+        line_color="rgba(0,0,0,0.7)",
+        line_width=2
+    )
+
+    fig_fe.add_annotation(
+        x="2026-02-28",
+        y=series_fe.quantile(0.9),
+        text="Geopolitical Shock (Feb 2026)",
+        showarrow=False,
+        xshift=70,
+        yshift=105,
+        font=dict(size=10, color="rgba(0,0,0,0.9)")
+    )
+
+    st.plotly_chart(fig_fe, use_container_width=True, config={"displayModeBar": False})
+
+st.markdown("""
+Ferrous material is likely to represent the bulk-volume revenue component in ELV dismantling. 
+LME Steel HRC NW Europe (Argus) provides a real European steel-market price series, converted here into SEK/tonne for comparison with Swedish operating conditions. 
+While it is not a Swedish yard-level ELV scrap price, it provides a useful directional indicator of broader ferrous-market conditions.
 """)
